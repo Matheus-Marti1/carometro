@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Registrar-se')}">
+    <meta charset="UTF-8">
+    <title>Registrar-se - Carômetro</title>
+</head>
+<body>
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <header th:replace="~{fragments/layout :: header}"></header>
+    <div th:replace="~{fragments/layout :: drawer}"></div>
+
+    <!-- Conteúdo principal -->
+    <main class="mdl-layout__content">
+        <div class="page-content">
+            <div th:replace="~{fragments/layout :: messages}"></div>
+
+            <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--8-col mdl-cell--2-offset mdl-shadow--2dp form-container">
+                    <div class="form-header">
+                        <h2 class="form-title">Registro de Ex-Aluno</h2>
+                        <p class="form-subtitle">Preencha seus dados para compartilhar sua história com a comunidade FATEC</p>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="registration-progress-container">
+                        <div class="registration-progress">
+                            <div class="progress-step active" data-step="personal-data">
+                                <div class="step-number">1</div>
+                                <div class="step-label">Dados Pessoais</div>
+                            </div>
+                            <div class="progress-connector"></div>
+                            <div class="progress-step" data-step="story">
+                                <div class="step-number">2</div>
+                                <div class="step-label">Sua História</div>
+                            </div>
+                            <div class="progress-connector"></div>
+                            <div class="progress-step" data-step="additional-info">
+                                <div class="step-number">3</div>
+                                <div class="step-label">Foto e Links</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mensagem de erro global -->
+                    <div class="error-message-global" th:if="${erro}" th:text="${erro}">
+                        Erro ao processar o formulário
+                    </div>
+
+                    <form th:action="@{/registro}" method="post" th:object="${exAlunoDTO}" enctype="multipart/form-data" id="registration-form">
+                        <!-- Step 1: Dados Pessoais -->
+                        <div class="form-step active" id="personal-data-step">
+                            <div class="form-section">
+                                <h3 class="section-title">
+                                    <i class="material-icons section-icon">person</i>
+                                    Dados Pessoais
+                                </h3>
+
+                                <div class="mdl-grid">
+                                    <div class="mdl-cell mdl-cell--12-col">
+                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                            <input class="mdl-textfield__input" type="text" id="nome" name="nome" th:field="*{nome}" required>
+                                            <label class="mdl-textfield__label" for="nome">Nome Completo</label>
+                                            <span class="mdl-textfield__error">Nome é obrigatório</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="mdl-cell mdl-cell--6-col mdl-cell--12-col-tablet">
+                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                            <input class="mdl-textfield__input" type="email" id="email" name="email" th:field="*{email}" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
+                                            <label class="mdl-textfield__label" for="email">E-mail</label>
+                                            <span class="mdl-textfield__error">E-mail inválido</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="mdl-cell mdl-cell--6-col mdl-cell--12-col-tablet">
+                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                            <input class="mdl-textfield__input" type="password" id="senha" name="senha" th:field="*{senha}" required minlength="6">
+                                            <label class="mdl-textfield__label" for="senha">Senha</label>
+                                            <span class="mdl-textfield__error">Mínimo de 6 caracteres</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="mdl-cell mdl-cell--6-col mdl-cell--12-col-tablet">
+                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                            <input class="mdl-textfield__input" type="text" id="curso" name="curso" th:field="*{curso}" required>
+                                            <label class="mdl-textfield__label" for="curso">Curso</label>
+                                            <span class="mdl-textfield__error">Curso é obrigatório</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="mdl-cell mdl-cell--6-col mdl-cell--12-col-tablet">
+                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                            <input class="mdl-textfield__input" type="number" id="anoFormatura" name="anoFormatura" th:field="*{anoFormatura}" required min="1970" th:max="${#dates.format(#dates.createNow(), 'yyyy')}">
+                                            <label class="mdl-textfield__label" for="anoFormatura">Ano de Formatura</label>
+                                            <span class="mdl-textfield__error">Ano de formatura inválido</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-navigation">
+                                <div></div> <!-- Espaço para alinhar o botão à direita -->
+                                <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored next-step">
+                                    Próximo <i class="material-icons">arrow_forward</i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Sua História -->
+                        <div class="form-step" id="story-step">
+                            <div class="form-section">
+                                <h3 class="section-title">
+                                    <i class="material-icons section-icon">history_edu</i>
+                                    Sua História
+                                </h3>
+
+                                <div class="mdl-grid">
+                                    <div class="mdl-cell mdl-cell--12-col">
+                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                            <textarea class="mdl-textfield__input" type="text" rows="4" id="historicoProfissional" name="historicoProfissional" th:field="${postagemDTO.historicoProfissional}" required></textarea>
+                                            <label class="mdl-textfield__label" for="historicoProfissional">Histórico Profissional</label>
+                                            <span class="mdl-textfield__error">Este campo é obrigatório</span>
+                                            <div class="field-helper-text">Conte sobre sua carreira após se formar na FATEC</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mdl-cell mdl-cell--12-col">
+                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                            <textarea class="mdl-textfield__input" type="text" rows="4" id="comentarioFaculdade" name="comentarioFaculdade" th:field="${postagemDTO.comentarioFaculdade}" required></textarea>
+                                            <label class="mdl-textfield__label" for="comentarioFaculdade">Comentário sobre a Faculdade</label>
+                                            <span class="mdl-textfield__error">Este campo é obrigatório</span>
+                                            <div class="field-helper-text">Compartilhe sua experiência na FATEC e como ela contribuiu para sua formação</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mdl-cell mdl-cell--12-col">
+                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                            <textarea class="mdl-textfield__input" type="text" rows="3" id="comentarioLivre" name="comentarioLivre" th:field="${postagemDTO.comentarioLivre}"></textarea>
+                                            <label class="mdl-textfield__label" for="comentarioLivre">Comentário Livre (opcional)</label>
+                                            <div class="field-helper-text">Adicione qualquer outro comentário que desejar compartilhar</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-navigation">
+                                <button type="button" class="mdl-button mdl-js-button mdl-button--raised prev-step">
+                                    <i class="material-icons">arrow_back</i> Anterior
+                                </button>
+                                <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored next-step">
+                                    Próximo <i class="material-icons">arrow_forward</i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Foto e Links -->
+                        <div class="form-step" id="additional-info-step">
+                            <div class="form-section">
+                                <h3 class="section-title">
+                                    <i class="material-icons section-icon">face</i>
+                                    Sua Foto
+                                </h3>
+
+                                <div class="photo-upload-container">
+                                    <div class="photo-preview" id="photo-preview">
+                                        <i class="material-icons">add_a_photo</i>
+                                        <span>Prévia da foto</span>
+                                    </div>
+                                    <div class="photo-upload-controls">
+                                        <p>Faça upload de uma foto recente para seu perfil</p>
+                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--file">
+                                            <input class="mdl-textfield__input" placeholder="Selecione uma foto..." type="text" id="fotoTexto" readonly/>
+                                            <div class="mdl-button mdl-button--raised mdl-button--colored">
+                                                <i class="material-icons">attach_file</i>
+                                                <input type="file" name="foto" id="foto" accept="image/*" onchange="previewPhoto(this);" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h3 class="section-title">
+                                    <i class="material-icons section-icon">link</i>
+                                    Links Pessoais
+                                </h3>
+
+                                <p class="section-description">Adicione links para suas redes sociais, portfólio ou perfis profissionais</p>
+
+                                <div id="links-container">
+                                    <div class="link-item">
+                                        <div class="mdl-grid">
+                                            <div class="mdl-cell mdl-cell--5-col mdl-cell--4-col-tablet">
+                                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                                    <input class="mdl-textfield__input" type="text" id="linkTitulos0" name="linkTitulos">
+                                                    <label class="mdl-textfield__label" for="linkTitulos0">Título do Link</label>
+                                                </div>
+                                            </div>
+                                            <div class="mdl-cell mdl-cell--6-col mdl-cell--3-col-tablet">
+                                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                                    <input class="mdl-textfield__input" type="url" id="linkUrls0" name="linkUrls">
+                                                    <label class="mdl-textfield__label" for="linkUrls0">URL do Link</label>
+                                                </div>
+                                            </div>
+                                            <div class="mdl-cell mdl-cell--1-col mdl-cell--1-col-tablet link-actions">
+                                                <button type="button" class="mdl-button mdl-js-button mdl-button--icon link-icon-button add-link-btn" title="Adicionar outro link">
+                                                    <i class="material-icons">add_circle</i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Termos e condições -->
+                            <div class="form-section terms-section">
+                                <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="checkbox">
+                                    <input type="checkbox" id="checkbox" class="mdl-checkbox__input" required>
+                                    <span class="mdl-checkbox__label">Concordo com os <a href="#" class="terms-link">Termos e Condições</a> e autorizo o uso de minhas informações no Carômetro</span>
+                                </label>
+                            </div>
+
+                            <div class="form-navigation">
+                                <button type="button" class="mdl-button mdl-js-button mdl-button--raised prev-step">
+                                    <i class="material-icons">arrow_back</i> Anterior
+                                </button>
+                                <button type="submit" class="mdl-button mdl-button--raised mdl-button--accent">
+                                    <i class="material-icons">how_to_reg</i> Concluir Registro
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <footer th:replace="~{fragments/layout :: footer}"></footer>
+        </div>
+    </main>
+</div>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+<script>
+    // Navegação entre etapas do formulário
+    document.addEventListener('DOMContentLoaded', function() {
+        // Elementos da navegação
+        const steps = document.querySelectorAll('.form-step');
+        const progressSteps = document.querySelectorAll('.progress-step');
+        const nextButtons = document.querySelectorAll('.next-step');
+        const prevButtons = document.querySelectorAll('.prev-step');
+
+        // Controle de Links
+        const linksContainer = document.getElementById('links-container');
+        let linkCounter = 1;
+
+        // Função para adicionar novo link
+        function addNewLink() {
+            const linkDiv = document.createElement('div');
+            linkDiv.className = 'link-item';
+            linkDiv.innerHTML = `
+                <div class="mdl-grid">
+                    <div class="mdl-cell mdl-cell--5-col mdl-cell--4-col-tablet">
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                            <input class="mdl-textfield__input" type="text" id="linkTitulos${linkCounter}" name="linkTitulos">
+                            <label class="mdl-textfield__label" for="linkTitulos${linkCounter}">Título do Link</label>
+                        </div>
+                    </div>
+                    <div class="mdl-cell mdl-cell--6-col mdl-cell--3-col-tablet">
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                            <input class="mdl-textfield__input" type="url" id="linkUrls${linkCounter}" name="linkUrls">
+                            <label class="mdl-textfield__label" for="linkUrls${linkCounter}">URL do Link</label>
+                        </div>
+                    </div>
+                    <div class="mdl-cell mdl-cell--1-col mdl-cell--1-col-tablet link-actions">
+                        <button type="button" class="mdl-button mdl-js-button mdl-button--icon link-icon-button remove-link-btn" title="Remover este link">
+                            <i class="material-icons">remove_circle</i>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            linksContainer.appendChild(linkDiv);
+            linkCounter++;
+
+            // Ativa o Material Design para os novos campos
+            componentHandler.upgradeElements(linkDiv);
+
+            // Adiciona evento para remover o link
+            const removeButton = linkDiv.querySelector('.remove-link-btn');
+            removeButton.addEventListener('click', function() {
+                linkDiv.remove();
+            });
+        }
+
+        // Evento para adicionar link
+        document.querySelector('.add-link-btn').addEventListener('click', addNewLink);
+
+        // Navegação para próxima etapa
+        nextButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Encontrar a etapa atual e a próxima
+                const currentStep = button.closest('.form-step');
+                const currentIndex = Array.from(steps).indexOf(currentStep);
+                const nextStep = steps[currentIndex + 1];
+
+                // Validar campos da etapa atual antes de avançar
+                const inputs = currentStep.querySelectorAll('input[required], textarea[required]');
+                let isValid = true;
+
+                inputs.forEach(input => {
+                    if (!input.validity.valid) {
+                        isValid = false;
+                        // Ativa as mensagens de erro do MDL
+                        input.parentNode.classList.add('is-invalid');
+                    }
+                });
+
+                if (!isValid) return;
+
+                // Avançar para próxima etapa
+                currentStep.classList.remove('active');
+                nextStep.classList.add('active');
+
+                // Atualizar indicador de progresso
+                progressSteps[currentIndex].classList.add('completed');
+                progressSteps[currentIndex + 1].classList.add('active');
+
+                // Scroll para o topo do formulário
+                document.querySelector('.form-container').scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        // Navegação para etapa anterior
+        prevButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const currentStep = button.closest('.form-step');
+                const currentIndex = Array.from(steps).indexOf(currentStep);
+                const prevStep = steps[currentIndex - 1];
+
+                currentStep.classList.remove('active');
+                prevStep.classList.add('active');
+
+                // Atualizar indicador de progresso
+                progressSteps[currentIndex].classList.remove('active');
+                progressSteps[currentIndex - 1].classList.add('active');
+
+                // Scroll para o topo do formulário
+                document.querySelector('.form-container').scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    });
+
+    // Função para pré-visualização da foto
+    function previewPhoto(input) {
+        const preview = document.getElementById('photo-preview');
+        document.getElementById('fotoTexto').value = input.files[0]?.name || '';
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                preview.innerHTML = '';
+                preview.style.backgroundImage = `url('${e.target.result}')`;
+                preview.style.backgroundSize = 'cover';
+                preview.style.backgroundPosition = 'center';
+            }
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+
+<style>
+    /* Container do Formulário */
+    .form-container {
+        padding: 0;
+        margin-bottom: 48px;
+        border-radius: 8px;
+        overflow: hidden;
+        background-color: white;
+    }
+
+    /* Cabeçalho do Formulário */
+    .form-header {
+        background-color: #9e1b09;
+        color: white;
+        padding: 24px;
+        text-align: center;
+    }
+
+    .form-title {
+        margin: 0 0 8px;
+        font-weight: 500;
+    }
+
+    .form-subtitle {
+        margin: 0;
+        opacity: 0.9;
+        font-weight: 300;
+    }
+
+    /* Indicador de Progresso */
+    .registration-progress-container {
+        background-color: #f5f5f5;
+        padding: 16px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .registration-progress {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .progress-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 8px 0;
+        position: relative;
+        color: rgba(0, 0, 0, 0.5);
+    }
+
+    .progress-step.active {
+        color: #9e1b09;
+    }
+
+    .progress-step.completed .step-number {
+        background-color: #4CAF50;
+    }
+
+    .step-number {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background-color: #9e1b09;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+
+    .progress-step:not(.active):not(.completed) .step-number {
+        background-color: #bdbdbd;
+    }
+
+    .step-label {
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .progress-connector {
+        height: 3px;
+        width: 60px;
+        background-color: #bdbdbd;
+        margin: 0 8px;
+    }
+
+    /* Etapas do Formulário */
+    .form-step {
+        display: none;
+        padding: 24px;
+    }
+
+    .form-step.active {
+        display: block;
+        animation: fadeIn 0.5s;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Seções do Formulário */
+    .form-section {
+        margin-bottom: 32px;
+    }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        color: #9e1b09;
+        font-size: 18px;
+        margin-bottom: 16px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .section-icon {
+        margin-right: 8px;
+        color: #9e1b09;
+    }
+
+    .section-description {
+        color: rgba(0, 0, 0, 0.6);
+        font-size: 14px;
+        margin-bottom: 16px;
+    }
+
+    /* Ajustes nos campos de texto */
+    .mdl-textfield {
+        width: 100%;
+    }
+
+    .field-helper-text {
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 12px;
+        margin-top: 4px;
+    }
+
+    /* Upload de foto */
+    .photo-upload-container {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        margin-top: 16px;
+    }
+
+    .photo-preview {
+        width: 150px;
+        height: 150px;
+        border-radius: 8px;
+        border: 2px dashed #bdbdbd;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #9e9e9e;
+        overflow: hidden;
+        background-color: #f5f5f5;
+    }
+
+    .photo-preview i {
+        font-size: 36px;
+        margin-bottom: 8px;
+    }
+
+    .photo-upload-controls {
+        flex-grow: 1;
+    }
+
+    /* Links pessoais */
+    .link-item {
+        margin-bottom: 16px;
+        padding: 16px;
+        border-radius: 4px;
+        background-color: #f9f9f9;
+    }
+
+    .link-actions {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .link-icon-button {
+        color: #9e1b09;
+    }
+
+    .add-link-btn i {
+        color: #4CAF50;
+    }
+
+    .remove-link-btn i {
+        color: #F44336;
+    }
+
+    /* Termos e Condições */
+    .terms-section {
+        margin: 24px 0;
+    }
+
+    .terms-link {
+        color: #9e1b09;
+        font-weight: 500;
+    }
+
+    /* Navegação do Formulário */
+    .form-navigation {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 32px;
+    }
+
+    /* Mensagem de erro */
+    .error-message-global {
+        background-color: #FFEBEE;
+        color: #D32F2F;
+        padding: 16px;
+        border-left: 4px solid #F44336;
+        margin-bottom: 24px;
+        font-weight: 500;
+    }
+
+    /* Responsividade */
+    @media (max-width: 839px) {
+        .photo-upload-container {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .form-navigation {
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-navigation button {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .step-label {
+            display: none;
+        }
+    }
+</style>
+</body>
+</html>

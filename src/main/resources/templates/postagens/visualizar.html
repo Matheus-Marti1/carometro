@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Detalhes da Postagem')}">
+    <meta charset="UTF-8">
+    <title>Detalhes da Postagem</title>
+</head>
+<body>
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <div th:replace="~{fragments/layout :: header}"></div>
+    <div th:replace="~{fragments/layout :: drawer}"></div>
+
+    <!-- Conteúdo principal -->
+    <main class="mdl-layout__content">
+        <div class="page-content">
+            <div th:replace="~{fragments/layout :: messages}"></div>
+
+            <div class="mdl-grid">
+                <!-- Cabeçalho da página com título e botão de voltar -->
+                <div class="mdl-cell mdl-cell--12-col page-header">
+                    <div class="page-navigation">
+                        <a th:href="@{/postagens/publicas}" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored back-button">
+                            <i class="material-icons">arrow_back</i>
+                            Voltar para Listagem
+                        </a>
+                    </div>
+                    <h1 class="page-title" th:text="${postagem.exAluno().nome()}">Nome do Ex-Aluno</h1>
+                </div>
+
+                <!-- Informações do Ex-Aluno -->
+                <div class="mdl-cell mdl-cell--4-col">
+                    <div class="mdl-card mdl-shadow--2dp profile-card">
+                        <div class="mdl-card__title">
+                            <h2 class="mdl-card__title-text">Informações Pessoais</h2>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <!-- Foto com fallback para avatar padrão -->
+                            <div class="foto-container">
+                                <img th:src="@{/postagens/foto/{id}(id=${postagem.id()})}"
+                                     alt="Foto de Perfil"
+                                     class="perfil-foto"
+                                     onerror="this.onerror=null;this.src='https://via.placeholder.com/300x300?text=Sem+Foto';this.classList.add('no-foto');">
+                            </div>
+
+                            <div class="info-section">
+                                <div class="info-label">Nome:</div>
+                                <div class="info-value" th:text="${postagem.exAluno().nome()}">Nome do Ex-Aluno</div>
+                            </div>
+
+                            <div class="info-section">
+                                <div class="info-label">Curso:</div>
+                                <div class="info-value" th:text="${postagem.exAluno().curso()}">Curso</div>
+                            </div>
+
+                            <div class="info-section">
+                                <div class="info-label">Ano de Formatura:</div>
+                                <div class="info-value" th:text="${postagem.exAluno().anoFormatura()}">2020</div>
+                            </div>
+
+                            <!-- Links Pessoais -->
+                            <div class="info-section" th:if="${postagem.linksPessoais() != null && !postagem.linksPessoais().isEmpty()}">
+                                <div class="info-label">Links Pessoais:</div>
+                                <div class="info-value">
+                                    <ul class="mdl-list links-list">
+                                        <li class="mdl-list__item" th:each="link : ${postagem.linksPessoais()}">
+                                            <span class="mdl-list__item-primary-content">
+                                                <i class="material-icons mdl-list__item-icon">link</i>
+                                                <a th:href="${link.url()}" target="_blank" th:text="${link.titulo()}">Link</a>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Data de Postagem -->
+                            <div class="info-section post-date">
+                                <div class="info-label">Data da Postagem:</div>
+                                <div class="info-value" th:text="${#temporals.format(postagem.dataAprovacao(), 'dd/MM/yyyy')}">01/01/2023</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Conteúdo da Postagem -->
+                <div class="mdl-cell mdl-cell--8-col">
+                    <div class="mdl-card mdl-shadow--2dp content-card">
+                        <div class="mdl-card__title">
+                            <h2 class="mdl-card__title-text">História Profissional</h2>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <!-- Histórico Profissional -->
+                            <div class="info-section" th:if="${postagem.historicoProfissional() != null && !postagem.historicoProfissional().isEmpty()}">
+                                <div class="info-label">Trajetória Profissional:</div>
+                                <div class="info-value content-box" th:text="${postagem.historicoProfissional()}">
+                                    Histórico profissional do ex-aluno...
+                                </div>
+                            </div>
+
+                            <!-- Comentário sobre a Faculdade -->
+                            <div class="info-section" th:if="${postagem.comentarioFaculdade() != null && !postagem.comentarioFaculdade().isEmpty()}">
+                                <div class="info-label">Comentário sobre a Faculdade:</div>
+                                <div class="info-value content-box" th:text="${postagem.comentarioFaculdade()}">
+                                    Comentário sobre a faculdade...
+                                </div>
+                            </div>
+
+                            <!-- Comentário Livre -->
+                            <div class="info-section" th:if="${postagem.comentarioLivre() != null && !postagem.comentarioLivre().isEmpty()}">
+                                <div class="info-label">Comentário Livre:</div>
+                                <div class="info-value content-box" th:text="${postagem.comentarioLivre()}">
+                                    Comentário livre...
+                                </div>
+                            </div>
+
+                            <!-- Mensagem quando não há conteúdo -->
+                            <div class="info-section empty-message"
+                                 th:if="${(postagem.historicoProfissional() == null || postagem.historicoProfissional().isEmpty()) &&
+                                         (postagem.comentarioFaculdade() == null || postagem.comentarioFaculdade().isEmpty()) &&
+                                         (postagem.comentarioLivre() == null || postagem.comentarioLivre().isEmpty())}">
+                                <p>Este ex-aluno não compartilhou detalhes adicionais sobre sua trajetória.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div th:replace="~{fragments/layout :: footer}"></div>
+        </div>
+    </main>
+</div>
+
+<style>
+    /* Estilos aprimorados */
+    .page-header {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 24px;
+    }
+
+    .page-navigation {
+        margin-bottom: 16px;
+    }
+
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .back-button i {
+        margin-right: 8px;
+    }
+
+    .page-title {
+        margin: 0;
+        font-size: 32px;
+        font-weight: 400;
+        color: #3f51b5;
+        border-bottom: 1px solid #e0e0e0;
+        padding-bottom: 8px;
+        margin-bottom: 16px;
+    }
+
+    .profile-card, .content-card {
+        width: 100%;
+        height: 100%;
+    }
+
+    .mdl-card__title {
+        background-color: #3f51b5;
+        color: white;
+    }
+
+    .info-section {
+        margin-bottom: 20px;
+    }
+
+    .info-label {
+        font-weight: 500;
+        color: rgba(0,0,0,.54);
+        font-size: 14px;
+    }
+
+    .info-value {
+        margin-top: 5px;
+        color: rgba(0,0,0,.87);
+    }
+
+    .content-box {
+        border: 1px solid #e0e0e0;
+        padding: 16px;
+        border-radius: 4px;
+        background-color: #f5f5f5;
+        white-space: pre-wrap;
+        line-height: 1.5;
+    }
+
+    .foto-container {
+        text-align: center;
+        margin-bottom: 24px;
+    }
+
+    .perfil-foto {
+        max-width: 100%;
+        max-height: 300px;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        object-fit: cover;
+    }
+
+    .no-foto {
+        opacity: 0.7;
+    }
+
+    .links-list {
+        padding: 0;
+        margin: 0;
+    }
+
+    .links-list .mdl-list__item {
+        padding: 8px 0;
+        min-height: 36px;
+    }
+
+    .links-list a {
+        text-decoration: none;
+        color: #3f51b5;
+    }
+
+    .links-list a:hover {
+        text-decoration: underline;
+    }
+
+    .post-date {
+        margin-top: 20px;
+        border-top: 1px solid #e0e0e0;
+        padding-top: 15px;
+        font-size: 0.9em;
+    }
+
+    .empty-message {
+        color: rgba(0,0,0,.54);
+        font-style: italic;
+        text-align: center;
+        padding: 20px;
+    }
+
+    @media (max-width: 839px) {
+        .mdl-cell--4-col, .mdl-cell--8-col {
+            width: 100%;
+            margin: 8px 0;
+        }
+
+        .page-header {
+            margin-bottom: 16px;
+        }
+
+        .page-title {
+            font-size: 24px;
+        }
+    }
+</style>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

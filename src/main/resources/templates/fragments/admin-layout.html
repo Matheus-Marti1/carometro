@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Layout</title>
+</head>
+<body>
+
+<!-- Menu Lateral Administrativo -->
+<div th:fragment="drawer" class="mdl-layout__drawer admin-drawer">
+    <span class="mdl-layout-title">
+        Carômetro<br>
+        <small>Área Administrativa</small>
+    </span>
+    <nav class="mdl-navigation">
+        <!-- Links Globais -->
+        <a class="mdl-navigation__link" th:href="@{/}">
+            <i class="material-icons nav-icon">home</i> Página Inicial
+        </a>
+        <a class="mdl-navigation__link" th:href="@{/postagens/publicas}">
+            <i class="material-icons nav-icon">library_books</i> Postagens Públicas
+        </a>
+
+        <!-- Links visíveis apenas para usuários autenticados -->
+        <div sec:authorize="isAuthenticated()">
+            <div class="drawer-section">
+                <div class="drawer-section-title">Administração</div>
+
+                <!-- Links para ex-alunos -->
+                <div sec:authorize="hasRole('EX_ALUNO')">
+                    <a class="mdl-navigation__link" th:href="@{/ex-aluno/dashboard}">
+                        <i class="material-icons nav-icon">dashboard</i> Meu Dashboard
+                    </a>
+                    <a class="mdl-navigation__link" th:href="@{/ex-aluno/perfil}">
+                        <i class="material-icons nav-icon">person</i> Meu Perfil
+                    </a>
+                    <a class="mdl-navigation__link" th:href="@{/ex-aluno/postagem/editar}">
+                        <i class="material-icons nav-icon">edit</i> Minha Postagem
+                    </a>
+                </div>
+
+                <!-- Links para administradores -->
+                <div sec:authorize="hasAnyRole('ADMIN', 'COORDENADOR')">
+                    <a class="mdl-navigation__link" th:href="@{/admin/dashboard}">
+                        <i class="material-icons nav-icon">admin_panel_settings</i> Dashboard
+                    </a>
+                    <a class="mdl-navigation__link" th:href="@{/admin/postagens}">
+                        <i class="material-icons nav-icon">article</i> Gerenciar Postagens
+                    </a>
+                    <a class="mdl-navigation__link" th:href="@{/admin/ex-alunos}">
+                        <i class="material-icons nav-icon">people</i> Gerenciar Ex-Alunos
+                    </a>
+
+                    <!-- Link para adicionar usuário admin (apenas para ADMIN) -->
+                    <div sec:authorize="hasRole('ADMIN')">
+                        <a class="mdl-navigation__link" th:href="@{/admin/usuarios/novo}">
+                            <i class="material-icons nav-icon">person_add</i> Novo Usuário Admin
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Link de logout substituído por formulário -->
+            <div class="drawer-section">
+                <form th:action="@{/logout}" method="post" class="logout-form">
+                    <button type="submit" class="mdl-navigation__link logout-link">
+                        <i class="material-icons nav-icon">exit_to_app</i> Sair
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+</div>
+
+<!-- CSS específico para o admin layout -->
+<style th:fragment="admin-styles">
+    .admin-drawer .mdl-layout-title {
+        background-color: #7a1507;
+        color: white;
+        padding: 16px;
+        height: auto;
+        line-height: 1.3;
+    }
+
+    .admin-drawer .mdl-layout-title small {
+        font-size: 14px;
+        opacity: 0.8;
+        font-weight: 400;
+    }
+
+    .drawer-section {
+        border-top: 1px solid #e0e0e0;
+        margin-top: 8px;
+        padding-top: 8px;
+    }
+
+    .drawer-section-title {
+        padding: 8px 16px;
+        color: rgba(0, 0, 0, 0.54);
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .nav-icon {
+        margin-right: 16px;
+        vertical-align: middle;
+        color: #9e1b09;
+    }
+
+    .mdl-navigation__link {
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+    }
+
+    .mdl-navigation__link.is-active {
+        background-color: rgba(158, 27, 9, 0.1);
+        border-left: 4px solid #9e1b09;
+        font-weight: 500;
+    }
+
+    /* Estilização do botão de logout */
+    .logout-form {
+        width: 100%;
+    }
+
+    .logout-link {
+        color: #F44336 !important;
+        width: 100%;
+        text-align: left;
+        border: none;
+        background: none;
+        cursor: pointer;
+        font: inherit;
+        margin-top: auto;
+    }
+
+    .logout-link:hover {
+        background-color: rgba(244, 67, 54, 0.1);
+    }
+
+    /* Admin dashboard styles */
+    .admin-card {
+        width: 100%;
+        min-height: 100px;
+        margin-bottom: 16px;
+    }
+
+    .admin-card .mdl-card__title {
+        background-color: #9e1b09;
+        color: white;
+        height: 80px;
+    }
+
+    .admin-stat-value {
+        font-size: 28px;
+        font-weight: 500;
+        color: #9e1b09;
+        margin-right: 8px;
+    }
+
+    .admin-stat-label {
+        color: rgba(0, 0, 0, 0.54);
+    }
+
+    .admin-action-button {
+        margin-top: 8px;
+    }
+</style>
+
+<!-- Script para marcar o menu ativo -->
+<script th:fragment="admin-scripts">
+    // Função para marcar o link ativo no menu
+    document.addEventListener('DOMContentLoaded', function() {
+        // Marcar links ativos com base na URL atual
+        var currentPath = window.location.pathname;
+        document.querySelectorAll('.mdl-navigation__link').forEach(function(link) {
+            // Ignorar se for o botão de logout
+            if (link.tagName === 'BUTTON') return;
+
+            var href = link.getAttribute('href');
+            // Remove o contexto da aplicação para comparação
+            if (href && href.indexOf('/') !== -1) {
+                href = href.substring(href.lastIndexOf('/'));
+            }
+
+            if (currentPath.endsWith(href) && href !== '/') {
+                link.classList.add('is-active');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

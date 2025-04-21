@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Início')}">
+    <meta charset="UTF-8">
+    <title>Início - Carômetro</title>
+</head>
+<body id="top">
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <header th:replace="~{fragments/layout :: header}"></header>
+    <div th:replace="~{fragments/layout :: drawer}"></div>
+
+    <!-- Conteúdo principal -->
+    <main class="mdl-layout__content">
+        <div class="page-content">
+            <div th:replace="~{fragments/layout :: messages}"></div>
+
+            <!-- Banner Principal -->
+            <div class="hero-banner">
+                <div class="hero-content">
+                    <h1 class="hero-title">Histórias de Sucesso da Fatec Zona Leste</h1>
+                    <p class="hero-subtitle">Conectando ex-alunos e compartilhando trajetórias profissionais</p>
+                    <div class="hero-actions">
+                        <a th:href="@{/postagens/publicas}" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+                            <i class="material-icons">visibility</i> Ver Histórias
+                        </a>
+                        <a sec:authorize="isAnonymous()" th:href="@{/registro}" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+                            <i class="material-icons">how_to_reg</i> Juntar-se
+                        </a>
+                        <!-- Evitando expressão complexa que causou erro -->
+                        <a sec:authorize="hasRole('EX_ALUNO')" th:href="@{/ex-aluno/postagem/editar}"
+                           class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent">
+                            <i class="material-icons">add</i> Compartilhar Minha História
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cards Para Diferentes Públicos -->
+            <div class="section target-audiences">
+                <h2 class="section-title">Para Cada Perfil</h2>
+                <div class="mdl-grid">
+                    <div class="mdl-cell mdl-cell--4-col">
+                        <div class="mdl-card mdl-shadow--2dp audience-card ex-aluno-card">
+                            <div class="mdl-card__title">
+                                <h2 class="mdl-card__title-text">Para Ex-Alunos</h2>
+                            </div>
+                            <div class="mdl-card__supporting-text">
+                                <ul class="feature-list">
+                                    <li><i class="material-icons">check_circle</i> Compartilhe sua trajetória profissional</li>
+                                    <li><i class="material-icons">check_circle</i> Mantenha contato com colegas de turma</li>
+                                    <li><i class="material-icons">check_circle</i> Inspire novos alunos com sua história</li>
+                                </ul>
+                            </div>
+                            <div class="mdl-card__actions mdl-card--border">
+                                <a sec:authorize="!hasRole('EX_ALUNO')" th:href="@{/registro}"
+                                   class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                                    Criar Conta
+                                </a>
+                                <a sec:authorize="hasRole('EX_ALUNO')" th:href="@{/ex-aluno/dashboard}"
+                                   class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                                    Meu Dashboard
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mdl-cell mdl-cell--4-col">
+                        <div class="mdl-card mdl-shadow--2dp audience-card visitor-card">
+                            <div class="mdl-card__title">
+                                <h2 class="mdl-card__title-text">Para Visitantes</h2>
+                            </div>
+                            <div class="mdl-card__supporting-text">
+                                <ul class="feature-list">
+                                    <li><i class="material-icons">check_circle</i> Conheça trajetórias de sucesso</li>
+                                    <li><i class="material-icons">check_circle</i> Descubra o impacto da FATEC no mercado</li>
+                                    <li><i class="material-icons">check_circle</i> Inspire-se com histórias reais</li>
+                                </ul>
+                            </div>
+                            <div class="mdl-card__actions mdl-card--border">
+                                <a th:href="@{/postagens/publicas}" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                                    Explorar Histórias
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mdl-cell mdl-cell--4-col">
+                        <div class="mdl-card mdl-shadow--2dp audience-card coordinator-card">
+                            <div class="mdl-card__title">
+                                <h2 class="mdl-card__title-text">Para Coordenadores</h2>
+                            </div>
+                            <div class="mdl-card__supporting-text">
+                                <ul class="feature-list">
+                                    <li><i class="material-icons">check_circle</i> Acompanhe trajetórias dos egressos</li>
+                                    <li><i class="material-icons">check_circle</i> Use dados para melhorar o curso</li>
+                                    <li><i class="material-icons">check_circle</i> Mantenha contato com ex-alunos</li>
+                                </ul>
+                            </div>
+                            <div class="mdl-card__actions mdl-card--border">
+                                <a sec:authorize="!hasRole('COORDENADOR')" th:href="@{/login}"
+                                   class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                                    Acesso Coordenador
+                                </a>
+                                <a sec:authorize="hasRole('COORDENADOR')" th:href="@{/coordenador/dashboard}"
+                                   class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                                    Área da Coordenação
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </main>
+</div>
+
+<!-- CSS Adicional para Home -->
+<style>
+    /* Hero Banner */
+    .hero-banner {
+        background: linear-gradient(rgba(158, 27, 9, 0.9), rgba(158, 27, 9, 0.7)),
+        url('https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        padding: 80px 24px;
+        text-align: center;
+        margin-bottom: 48px;
+    }
+
+    .hero-title {
+        font-size: 36px;
+        margin-bottom: 16px;
+    }
+
+    .hero-subtitle {
+        font-size: 18px;
+        margin-bottom: 32px;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .hero-actions .mdl-button {
+        margin: 0 8px 8px;
+    }
+
+    /* Seções */
+    .section {
+        padding: 48px 24px;
+    }
+
+    .section-title {
+        text-align: center;
+        color: #9e1b09;
+        margin-bottom: 40px;
+        font-weight: 400;
+        position: relative;
+    }
+
+    .section-title:after {
+        content: '';
+        display: block;
+        width: 60px;
+        height: 3px;
+        background: #9e1b09;
+        margin: 12px auto;
+    }
+
+    /* Cards de Público */
+    .audience-card {
+        height: 100%;
+        transition: transform 0.2s ease;
+    }
+
+    .audience-card:hover {
+        transform: translateY(-4px);
+    }
+
+    .audience-card .mdl-card__title {
+        height: 100px;
+        color: white;
+    }
+
+    /* Ajuste específico para a cor do botão no card ex-aluno */
+    .ex-aluno-card .mdl-button--colored {
+        color: #9e1b09;
+    }
+
+    .feature-list {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .feature-list li {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .feature-list li i {
+        color: #4CAF50;
+        margin-right: 12px;
+        font-size: 18px;
+    }
+
+    /* Responsividade */
+    @media (max-width: 839px) {
+        .hero-title {
+            font-size: 28px;
+        }
+
+        .hero-subtitle {
+            font-size: 16px;
+        }
+    }
+</style>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

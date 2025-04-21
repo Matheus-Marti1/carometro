@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Login')}">
+    <meta charset="UTF-8">
+    <title>Login - Carômetro</title>
+</head>
+<body>
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <header th:replace="~{fragments/layout :: header}"></header>
+    <div th:replace="~{fragments/layout :: drawer}"></div>
+
+    <!-- Conteúdo principal -->
+    <main class="mdl-layout__content">
+        <div class="page-content">
+            <div th:replace="~{fragments/layout :: messages}"></div>
+
+            <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--4-col mdl-cell--4-offset">
+                    <div class="mdl-card mdl-shadow--2dp form-card">
+                        <div class="mdl-card__title">
+                            <h2 class="mdl-card__title-text">Login</h2>
+                        </div>
+
+                        <div class="mdl-card__supporting-text">
+                            <form th:action="@{/login}" method="post">
+                                <div th:if="${param.error}" class="mdl-textfield__error" style="display: block; margin-bottom: 20px;">
+                                    <span th:if="${session['SPRING_SECURITY_LAST_EXCEPTION']} != null">
+                                        <span th:if="${session['SPRING_SECURITY_LAST_EXCEPTION'].message == 'Bad credentials'}">
+                                            Usuário ou senha inválidos.
+                                        </span>
+                                        <span th:if="${session['SPRING_SECURITY_LAST_EXCEPTION'].message == 'User account is locked'}">
+                                            Sua conta está bloqueada. Entre em contato com o administrador.
+                                        </span>
+                                        <span th:unless="${session['SPRING_SECURITY_LAST_EXCEPTION'].message == 'Bad credentials' || session['SPRING_SECURITY_LAST_EXCEPTION'].message == 'User account is locked'}">
+                                            Erro ao fazer login. Por favor, tente novamente.
+                                        </span>
+                                    </span>
+                                    <span th:unless="${session['SPRING_SECURITY_LAST_EXCEPTION']} != null">
+                                        Usuário ou senha inválidos.
+                                    </span>
+                                </div>
+                                <div th:if="${param.logout}" class="success-message" style="display: block; margin-bottom: 20px;">
+                                    Você foi desconectado com sucesso.
+                                </div>
+
+                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                    <input class="mdl-textfield__input" type="email" id="username" name="username">
+                                    <label class="mdl-textfield__label" for="username">E-mail</label>
+                                </div>
+
+                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                    <input class="mdl-textfield__input" type="password" id="password" name="password">
+                                    <label class="mdl-textfield__label" for="password">Senha</label>
+                                </div>
+
+                                <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="remember-me">
+                                    <input type="checkbox" id="remember-me" name="remember-me" class="mdl-checkbox__input">
+                                    <span class="mdl-checkbox__label">Lembrar-me</span>
+                                </label>
+
+                                <div class="mdl-card__actions">
+                                    <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect mdl-button--raised mdl-button--primary" type="submit">
+                                        Entrar
+                                    </button>
+                                    <a th:href="@{/registro}" class="mdl-button mdl-js-button mdl-js-ripple-effect">
+                                        Registrar-se
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </main>
+</div>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

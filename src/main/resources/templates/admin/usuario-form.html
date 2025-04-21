@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Novo Usuário')}">
+    <meta charset="UTF-8">
+    <title>Novo Usuário - Carômetro</title>
+</head>
+<body>
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <header th:replace="~{fragments/layout :: header}"></header>
+    <div th:replace="~{fragments/admin-layout :: drawer}"></div>
+
+    <!-- Conteúdo principal -->
+    <main class="mdl-layout__content">
+        <div class="page-content">
+            <div th:replace="~{fragments/layout :: messages}"></div>
+
+            <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--12-col">
+                    <a th:href="@{/admin/dashboard}" class="mdl-button mdl-js-button mdl-button--icon">
+                        <i class="material-icons">arrow_back</i>
+                    </a>
+                    <span style="margin-left: 10px; font-size: 24px; vertical-align: middle;">Novo Usuário Administrativo</span>
+                </div>
+
+                <div class="mdl-cell mdl-cell--6-col mdl-cell--3-offset">
+                    <div class="mdl-card mdl-shadow--2dp" style="width: 100%;">
+                        <div class="mdl-card__title">
+                            <h2 class="mdl-card__title-text">Cadastrar Novo Usuário</h2>
+                        </div>
+
+                        <div class="mdl-card__supporting-text">
+                            <form th:action="@{/admin/usuarios/novo}" th:object="${usuario}" method="post">
+                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                    <input class="mdl-textfield__input" type="text" id="nome" th:field="*{nome}">
+                                    <label class="mdl-textfield__label" for="nome">Nome</label>
+                                    <span class="mdl-textfield__error" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}">
+                                        Nome é obrigatório
+                                    </span>
+                                </div>
+
+                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                    <input class="mdl-textfield__input" type="email" id="email" th:field="*{email}">
+                                    <label class="mdl-textfield__label" for="email">Email</label>
+                                    <span class="mdl-textfield__error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">
+                                        Email inválido
+                                    </span>
+                                </div>
+
+                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                    <input class="mdl-textfield__input" type="password" id="senha" th:field="*{senha}">
+                                    <label class="mdl-textfield__label" for="senha">Senha</label>
+                                    <span class="mdl-textfield__error" th:if="${#fields.hasErrors('senha')}" th:errors="*{senha}">
+                                        Senha é obrigatória
+                                    </span>
+                                </div>
+
+                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                    <select class="mdl-textfield__input" id="role" th:field="*{role}" onchange="toggleAreaCoordenacao()">
+                                        <option value="">Selecione o Papel</option>
+                                        <option value="ADMIN">Administrador</option>
+                                        <option value="COORDENADOR">Coordenador</option>
+                                    </select>
+                                    <label class="mdl-textfield__label" for="role">Papel</label>
+                                    <span class="mdl-textfield__error" th:if="${#fields.hasErrors('role')}" th:errors="*{role}">
+                                        Papel é obrigatório
+                                    </span>
+                                </div>
+
+                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                    <input class="mdl-textfield__input" type="text" id="departamento" th:field="*{departamento}">
+                                    <label class="mdl-textfield__label" for="departamento">Departamento</label>
+                                    <span class="mdl-textfield__error" th:if="${#fields.hasErrors('departamento')}" th:errors="*{departamento}">
+                                        Departamento é obrigatório
+                                    </span>
+                                </div>
+
+                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" id="areaCoordenacao-div" style="display: none;">
+                                    <input class="mdl-textfield__input" type="text" id="areaCoordenacao" th:field="*{areaCoordenacao}">
+                                    <label class="mdl-textfield__label" for="areaCoordenacao">Área de Coordenação</label>
+                                    <span class="mdl-textfield__error" th:if="${#fields.hasErrors('areaCoordenacao')}" th:errors="*{areaCoordenacao}">
+                                        Área de coordenação é obrigatória para coordenadores
+                                    </span>
+                                </div>
+
+                                <div class="mdl-card__actions">
+                                    <button type="submit" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect mdl-button--raised">
+                                        Salvar
+                                    </button>
+                                    <a th:href="@{/admin/usuarios}" class="mdl-button mdl-js-button mdl-js-ripple-effect">
+                                        Cancelar
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </main>
+</div>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+<script>
+    function toggleAreaCoordenacao() {
+        var role = document.getElementById('role').value;
+        var areaCoordenacaoDiv = document.getElementById('areaCoordenacao-div');
+
+        if (role === 'COORDENADOR') {
+            areaCoordenacaoDiv.style.display = 'block';
+        } else {
+            areaCoordenacaoDiv.style.display = 'none';
+        }
+    }
+
+    // Chamar no carregamento da página para configurar o estado inicial
+    document.addEventListener('DOMContentLoaded', function() {
+        toggleAreaCoordenacao();
+    });
+</script>
+</body>
+</html>

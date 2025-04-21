@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Editar Postagem')}">
+    <meta charset="UTF-8">
+    <title>Editar Postagem</title>
+</head>
+<body>
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <div th:replace="~{fragments/layout :: header}"></div>
+    <div th:replace="~{fragments/layout :: drawer}"></div>
+
+    <!-- Conteúdo principal -->
+    <main class="mdl-layout__content">
+        <div class="page-content">
+            <div th:replace="~{fragments/layout :: messages}"></div>
+
+            <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--12-col">
+                    <div class="page-header">
+                        <a th:href="@{/ex-aluno/dashboard}" class="mdl-button mdl-button--colored mdl-js-button mdl-button--icon back-button">
+                            <i class="material-icons">arrow_back</i>
+                        </a>
+                        <h1 class="page-title">Editar Minha História</h1>
+                    </div>
+
+                    <div class="mdl-grid">
+                        <!-- Formulário principal de edição -->
+                        <div class="mdl-cell mdl-cell--7-col mdl-cell--12-col-tablet">
+                            <div class="mdl-card mdl-shadow--2dp card-full-width">
+                                <div class="mdl-card__title mdl-card--colored">
+                                    <h2 class="mdl-card__title-text">Informações da Postagem</h2>
+                                </div>
+                                <div class="mdl-card__supporting-text">
+                                    <form th:action="@{/ex-aluno/postagem/editar}"
+                                          method="post"
+                                          th:object="${postagemDTO}"
+                                          enctype="multipart/form-data">
+
+                                        <!-- Histórico Profissional -->
+                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-full-width">
+                                            <label for="historicoProfissional" class="mdl-textfield__label">Trajetória Profissional</label>
+                                            <textarea class="mdl-textfield__input"
+                                                      type="text"
+                                                      id="historicoProfissional"
+                                                      name="historicoProfissional"
+                                                      th:field="*{historicoProfissional}"
+                                                      rows="6"></textarea>
+                                            <span class="mdl-textfield__error"
+                                                  th:if="${#fields.hasErrors('historicoProfissional')}"
+                                                  th:errors="*{historicoProfissional}">
+                                                Erro no histórico profissional
+                                            </span>
+                                            <span class="field-helper-text">Conte sua trajetória após a formatura. Quais empresas trabalhou, cargos, etc.</span>
+                                        </div>
+
+                                        <!-- Comentário sobre a Faculdade -->
+                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-full-width">
+                                            <label for="comentarioFaculdade" class="mdl-textfield__label">Comentário sobre a Faculdade</label>
+                                            <textarea class="mdl-textfield__input"
+                                                      type="text"
+                                                      id="comentarioFaculdade"
+                                                      name="comentarioFaculdade"
+                                                      th:field="*{comentarioFaculdade}"
+                                                      rows="4"></textarea>
+                                            <span class="mdl-textfield__error"
+                                                  th:if="${#fields.hasErrors('comentarioFaculdade')}"
+                                                  th:errors="*{comentarioFaculdade}">
+                                                Erro no comentário
+                                            </span>
+                                            <span class="field-helper-text">Como a faculdade contribuiu para sua carreira? Alguma disciplina ou projeto foi marcante?</span>
+                                        </div>
+
+                                        <!-- Comentário Livre -->
+                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-full-width">
+                                            <label for="comentarioLivre" class="mdl-textfield__label">Comentário Livre</label>
+                                            <textarea class="mdl-textfield__input"
+                                                      type="text"
+                                                      id="comentarioLivre"
+                                                      name="comentarioLivre"
+                                                      th:field="*{comentarioLivre}"
+                                                      rows="4"></textarea>
+                                            <span class="mdl-textfield__error"
+                                                  th:if="${#fields.hasErrors('comentarioLivre')}"
+                                                  th:errors="*{comentarioLivre}">
+                                                Erro no comentário
+                                            </span>
+                                            <span class="field-helper-text">Compartilhe uma mensagem, conselho ou qualquer outra informação que desejar.</span>
+                                        </div>
+
+                                        <!-- Upload de Foto -->
+                                        <div class="foto-upload-section">
+                                            <div class="section-label">Foto de Perfil</div>
+                                            <div class="foto-preview-container">
+                                                <img id="fotoPreview" th:src="@{/postagens/foto/{id}(id=${postagemId})}"
+                                                     alt="Prévia da Foto"
+                                                     onerror="this.onerror=null;this.src='https://via.placeholder.com/200x200?text=Sem+Foto';this.classList.add('no-foto');">
+                                            </div>
+                                            <div class="file-input-container">
+                                                <label for="novaFoto" class="file-input-label">
+                                                    <i class="material-icons">photo_camera</i>
+                                                    <span>Escolher Nova Foto</span>
+                                                </label>
+                                                <input type="file"
+                                                       id="novaFoto"
+                                                       name="novaFoto"
+                                                       accept="image/*"
+                                                       class="file-input"
+                                                       onchange="previewImage()">
+                                                <div class="selected-file-name" id="selectedFileName">Nenhum arquivo selecionado</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-actions">
+                                            <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">
+                                                <i class="material-icons">save</i> Salvar Alterações
+                                            </button>
+                                            <a th:href="@{/ex-aluno/dashboard}" class="mdl-button mdl-js-button mdl-js-ripple-effect">
+                                                Cancelar
+                                            </a>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Gerenciamento de Links -->
+                        <div class="mdl-cell mdl-cell--5-col mdl-cell--12-col-tablet">
+                            <div class="mdl-card mdl-shadow--2dp card-full-width">
+                                <div class="mdl-card__title mdl-card--colored">
+                                    <h2 class="mdl-card__title-text">Meus Links</h2>
+                                </div>
+                                <div class="mdl-card__supporting-text">
+                                    <!-- Lista de links existentes -->
+                                    <div class="links-list" th:if="${postagem != null && postagem.linksPessoais() != null && !postagem.linksPessoais().isEmpty()}">
+                                        <ul class="mdl-list">
+                                            <li class="mdl-list__item two-line" th:each="link : ${postagem.linksPessoais()}">
+                                                <span class="mdl-list__item-primary-content">
+                                                    <i class="material-icons mdl-list__item-icon">link</i>
+                                                    <span th:text="${link.titulo()}">Título do Link</span>
+                                                    <span class="mdl-list__item-sub-title" th:text="${link.url()}">URL do link</span>
+                                                </span>
+                                                <span class="mdl-list__item-secondary-content">
+                                                    <a th:href="@{'/ex-aluno/postagem/link/' + ${link.id()} + '/excluir'}"
+                                                       class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored">
+                                                        <i class="material-icons">delete</i>
+                                                    </a>
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <!-- Mensagem quando não há links -->
+                                    <div class="no-links-message" th:if="${postagem == null || postagem.linksPessoais() == null || postagem.linksPessoais().isEmpty()}">
+                                        <p>Você ainda não adicionou nenhum link pessoal.</p>
+                                        <p>Adicione links para seu perfil profissional, portfolio ou redes sociais.</p>
+                                    </div>
+
+                                    <!-- Formulário para adicionar novo link -->
+                                    <form th:action="@{/ex-aluno/postagem/link/adicionar}"
+                                          method="post"
+                                          th:object="${novoLink}"
+                                          class="add-link-form">
+
+                                        <div class="form-title">Adicionar Novo Link</div>
+
+                                        <!-- Título do Link -->
+                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-full-width">
+                                            <input class="mdl-textfield__input"
+                                                   type="text"
+                                                   id="titulo"
+                                                   th:field="*{titulo}">
+                                            <label class="mdl-textfield__label" for="titulo">Título (ex: LinkedIn, GitHub)</label>
+                                            <span class="mdl-textfield__error"
+                                                  th:if="${#fields.hasErrors('titulo')}"
+                                                  th:errors="*{titulo}">
+                                                Erro no título
+                                            </span>
+                                        </div>
+
+                                        <!-- URL do Link -->
+                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label form-full-width">
+                                            <input class="mdl-textfield__input"
+                                                   type="text"
+                                                   id="url"
+                                                   th:field="*{url}">
+                                            <label class="mdl-textfield__label" for="url">URL (ex: https://linkedin.com/in/seuperfil)</label>
+                                            <span class="mdl-textfield__error"
+                                                  th:if="${#fields.hasErrors('url')}"
+                                                  th:errors="*{url}">
+                                                Erro na URL
+                                            </span>
+                                        </div>
+
+                                        <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">
+                                            <i class="material-icons">add_link</i> Adicionar Link
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div th:replace="~{fragments/layout :: footer}"></div>
+        </div>
+    </main>
+</div>
+
+<style>
+    /* Estilos gerais */
+    .page-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    .back-button {
+        margin-right: 16px;
+    }
+
+    .page-title {
+        color: #3f51b5;
+        margin: 0;
+        font-weight: 400;
+    }
+
+    .card-full-width {
+        width: 100%;
+        height: 100%;
+    }
+
+    .mdl-card__title.mdl-card--colored {
+        background-color: #3f51b5;
+        color: white;
+    }
+
+    /* Formulário */
+    .form-full-width {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .field-helper-text {
+        color: rgba(0, 0, 0, 0.54);
+        font-size: 12px;
+        margin-top: 4px;
+    }
+
+    .form-actions {
+        margin-top: 30px;
+    }
+
+    /* Upload de Foto */
+    .foto-upload-section {
+        margin: 20px 0;
+    }
+
+    .section-label {
+        font-weight: 500;
+        color: rgba(0, 0, 0, 0.7);
+        margin-bottom: 10px;
+    }
+
+    .foto-preview-container {
+        width: 200px;
+        height: 200px;
+        overflow: hidden;
+        border-radius: 4px;
+        margin-bottom: 15px;
+        border: 1px solid #e0e0e0;
+        background-color: #f5f5f5;
+    }
+
+    .foto-preview-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .foto-preview-container img.no-foto {
+        opacity: 0.6;
+    }
+
+    .file-input-container {
+        margin-bottom: 15px;
+    }
+
+    .file-input-label {
+        display: inline-flex;
+        align-items: center;
+        cursor: pointer;
+        color: #3f51b5;
+        padding: 8px 16px;
+        border: 1px solid #3f51b5;
+        border-radius: 4px;
+    }
+
+    .file-input-label i {
+        margin-right: 8px;
+    }
+
+    .file-input {
+        display: none;
+    }
+
+    .selected-file-name {
+        margin-top: 8px;
+        color: rgba(0, 0, 0, 0.54);
+        font-size: 14px;
+    }
+
+    /* Links */
+    .links-list {
+        margin-bottom: 30px;
+    }
+
+    .mdl-list__item {
+        padding: 8px 0;
+    }
+
+    .no-links-message {
+        color: rgba(0, 0, 0, 0.54);
+        margin-bottom: 30px;
+    }
+
+    .add-link-form {
+        padding-top: 20px;
+        border-top: 1px solid #e0e0e0;
+    }
+
+    .form-title {
+        font-weight: 500;
+        margin-bottom: 16px;
+        color: rgba(0, 0, 0, 0.7);
+    }
+</style>
+
+<script>
+    function previewImage() {
+        const fileInput = document.getElementById('novaFoto');
+        const fileNameDisplay = document.getElementById('selectedFileName');
+        const preview = document.getElementById('fotoPreview');
+
+        if (fileInput.files && fileInput.files[0]) {
+            const fileName = fileInput.files[0].name;
+            fileNameDisplay.textContent = fileName;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.classList.remove('no-foto');
+            }
+            reader.readAsDataURL(fileInput.files[0]);
+        } else {
+            fileNameDisplay.textContent = 'Nenhum arquivo selecionado';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar componentes do MDL
+        if (typeof componentHandler !== 'undefined') {
+            componentHandler.upgradeAllRegistered();
+        }
+    });
+</script>
+</body>
+</html>

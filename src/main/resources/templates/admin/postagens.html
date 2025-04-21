@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Gerenciar Postagens')}">
+    <meta charset="UTF-8">
+    <title>Gerenciar Postagens - Carômetro</title>
+</head>
+<body>
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <header th:replace="~{fragments/layout :: header}"></header>
+    <div th:replace="~{fragments/admin-layout :: drawer}"></div>
+
+    <!-- Conteúdo principal -->
+    <main class="mdl-layout__content">
+        <div class="page-content">
+            <div th:replace="~{fragments/layout :: messages}"></div>
+
+            <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--12-col">
+                    <h2>Gerenciar Postagens</h2>
+                </div>
+
+                <!-- Estatísticas de postagens -->
+                <div class="mdl-cell mdl-cell--3-col">
+                    <div class="mdl-card mdl-shadow--2dp status-card">
+                        <div class="mdl-card__title mdl-card--expand">
+                            <h2 class="mdl-card__title-text">Total</h2>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <span class="status-number" th:text="${page.totalElements}">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mdl-cell mdl-cell--3-col">
+                    <div class="mdl-card mdl-shadow--2dp status-card status-pending">
+                        <div class="mdl-card__title mdl-card--expand">
+                            <h2 class="mdl-card__title-text">Pendentes</h2>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <a th:href="@{/admin/postagens(status=PENDENTE)}">
+                                <span class="status-number">Ver</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="mdl-cell mdl-cell--3-col">
+                    <div class="mdl-card mdl-shadow--2dp status-card status-approved">
+                        <div class="mdl-card__title mdl-card--expand">
+                            <h2 class="mdl-card__title-text">Aprovadas</h2>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <a th:href="@{/admin/postagens(status=APROVADA)}">
+                                <span class="status-number">Ver</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="mdl-cell mdl-cell--3-col">
+                    <div class="mdl-card mdl-shadow--2dp status-card status-rejected">
+                        <div class="mdl-card__title mdl-card--expand">
+                            <h2 class="mdl-card__title-text">Rejeitadas</h2>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <a th:href="@{/admin/postagens(status=REJEITADA)}">
+                                <span class="status-number">Ver</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filtro de status -->
+                <div class="mdl-cell mdl-cell--12-col">
+                    <div class="filter-tabs">
+                        <a th:href="@{/admin/postagens}"
+                           th:class="${statusAtual == 'TODAS'} ? 'filter-tab active' : 'filter-tab'">
+                            Todas
+                        </a>
+                        <a th:each="status : ${statusOptions}"
+                           th:href="@{/admin/postagens(status=${status})}"
+                           th:class="${statusAtual == status} ? 'filter-tab active' : 'filter-tab'"
+                           th:text="${status}">
+                            Status
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Lista de Postagens -->
+                <div class="mdl-cell mdl-cell--12-col">
+                    <div class="mdl-card mdl-shadow--2dp" style="width: 100%;">
+                        <div class="mdl-card__title">
+                            <h2 class="mdl-card__title-text">
+                                <span th:if="${statusAtual == 'TODAS'}">Todas as Postagens</span>
+                                <span th:unless="${statusAtual == 'TODAS'}" th:text="'Postagens ' + ${statusAtual}">Postagens</span>
+                            </h2>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp" style="width: 100%;">
+                                <thead>
+                                <tr>
+                                    <th class="mdl-data-table__cell--non-numeric">Ex-Aluno</th>
+                                    <th class="mdl-data-table__cell--non-numeric">Data de Criação</th>
+                                    <th class="mdl-data-table__cell--non-numeric">Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="postagem : ${postagens}">
+                                    <td class="mdl-data-table__cell--non-numeric" th:text="${postagem.exAluno.nome}">Nome do Ex-Aluno</td>
+                                    <td class="mdl-data-table__cell--non-numeric" th:text="${#temporals.format(postagem.dataCriacao, 'dd/MM/yyyy HH:mm')}">01/01/2025</td>
+                                    <td class="mdl-data-table__cell--non-numeric">
+                                        <span th:if="${postagem.status.name() == 'APROVADA'}" class="status-badge status-aprovada">Aprovada</span>
+                                        <span th:if="${postagem.status.name() == 'PENDENTE'}" class="status-badge status-pendente">Pendente</span>
+                                        <span th:if="${postagem.status.name() == 'REJEITADA'}" class="status-badge status-rejeitada">Rejeitada</span>
+                                        <span th:if="${postagem.status.name() == 'DESABILITADA'}" class="status-badge status-desabilitada">Desabilitada</span>
+                                    </td>
+                                    <td>
+                                        <a th:href="@{/admin/postagens/{id}(id=${postagem.id})}"
+                                           class="mdl-button mdl-js-button mdl-button--icon"
+                                           title="Visualizar">
+                                            <i class="material-icons">visibility</i>
+                                        </a>
+
+                                        <!-- Botões de ação condicionais baseados no status -->
+                                        <div th:if="${postagem.status.name() == 'PENDENTE'}">
+                                            <button th:onclick="'document.getElementById(\'approve-form-' + ${postagem.id} + '\').submit();'"
+                                                    class="mdl-button mdl-js-button mdl-button--icon"
+                                                    title="Aprovar">
+                                                <i class="material-icons">check_circle</i>
+                                            </button>
+                                            <button th:onclick="'document.getElementById(\'reject-form-' + ${postagem.id} + '\').submit();'"
+                                                    class="mdl-button mdl-js-button mdl-button--icon"
+                                                    title="Rejeitar">
+                                                <i class="material-icons">cancel</i>
+                                            </button>
+
+                                            <form th:id="'approve-form-' + ${postagem.id}" th:action="@{/admin/postagens/{id}/aprovar(id=${postagem.id})}" method="post" style="display: none;"></form>
+                                            <form th:id="'reject-form-' + ${postagem.id}" th:action="@{/admin/postagens/{id}/rejeitar(id=${postagem.id})}" method="post" style="display: none;"></form>
+                                        </div>
+
+                                        <!-- Botões específicos para coordenador -->
+                                        <div sec:authorize="hasRole('COORDENADOR')">
+                                            <div th:if="${postagem.status.name() == 'APROVADA'}">
+                                                <button th:onclick="'document.getElementById(\'disable-form-' + ${postagem.id} + '\').submit();'"
+                                                        class="mdl-button mdl-js-button mdl-button--icon"
+                                                        title="Desabilitar">
+                                                    <i class="material-icons">block</i>
+                                                </button>
+                                                <form th:id="'disable-form-' + ${postagem.id}" th:action="@{/coordenador/postagens/{id}/desabilitar(id=${postagem.id})}" method="post" style="display: none;"></form>
+                                            </div>
+                                            <div th:if="${postagem.status.name() == 'DESABILITADA'}">
+                                                <button th:onclick="'document.getElementById(\'enable-form-' + ${postagem.id} + '\').submit();'"
+                                                        class="mdl-button mdl-js-button mdl-button--icon"
+                                                        title="Habilitar">
+                                                    <i class="material-icons">check_circle</i>
+                                                </button>
+                                                <form th:id="'enable-form-' + ${postagem.id}" th:action="@{/coordenador/postagens/{id}/habilitar(id=${postagem.id})}" method="post" style="display: none;"></form>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- Mensagem quando não há postagens -->
+                                <tr th:if="${#lists.isEmpty(postagens)}">
+                                    <td colspan="4" class="mdl-data-table__cell--non-numeric">
+                                        Nenhuma postagem encontrada
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                            <!-- Paginação -->
+                            <div th:if="${page.totalPages > 1}" class="pagination-container">
+                                <div class="pagination">
+                                    <a th:if="${!page.first}"
+                                       th:with="prevPage=${page.number - 1}"
+                                       th:href="@{/admin/postagens(status=${param.status},page=${prevPage},size=${page.size})}"
+                                       class="mdl-button mdl-js-button mdl-button--icon">
+                                        <i class="material-icons">chevron_left</i>
+                                    </a>
+                                    <span th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}">
+                                        <a th:if="${i == page.number}"
+                                           class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+                                            [[${i + 1}]]
+                                        </a>
+                                        <a th:unless="${i == page.number}"
+                                           th:href="@{/admin/postagens(status=${param.status},page=${i},size=${page.size})}"
+                                           class="mdl-button mdl-js-button">
+                                            [[${i + 1}]]
+                                        </a>
+                                    </span>
+                                    <a th:if="${!page.last}"
+                                       th:with="nextPage=${page.number + 1}"
+                                       th:href="@{/admin/postagens(status=${param.status},page=${nextPage},size=${page.size})}"
+                                       class="mdl-button mdl-js-button mdl-button--icon">
+                                        <i class="material-icons">chevron_right</i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </main>
+</div>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+<style>
+    .status-card {
+        min-height: 120px;
+    }
+    .status-pending {
+        border-left: 5px solid #FFA726;
+    }
+    .status-approved {
+        border-left: 5px solid #66BB6A;
+    }
+    .status-rejected {
+        border-left: 5px solid #EF5350;
+    }
+    .status-number {
+        font-size: 42px;
+        font-weight: 500;
+    }
+    .status-badge {
+        padding: 3px 8px;
+        border-radius: 4px;
+        color: white;
+        font-size: 12px;
+    }
+    .status-aprovada {
+        background-color: #66BB6A;
+    }
+    .status-pendente {
+        background-color: #FFA726;
+    }
+    .status-rejeitada {
+        background-color: #EF5350;
+    }
+    .status-desabilitada {
+        background-color: #9E9E9E;
+    }
+    .filter-tabs {
+        display: flex;
+        margin-bottom: 20px;
+    }
+    .filter-tab {
+        padding: 12px 24px;
+        color: rgba(0,0,0,.54);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border-bottom: 2px solid transparent;
+    }
+    .filter-tab.active {
+        color: rgba(0,0,0,.87);
+        border-bottom: 2px solid #3f51b5;
+    }
+    .filter-tab:hover {
+        background-color: rgba(0,0,0,.04);
+    }
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    .pagination {
+        display: flex;
+        align-items: center;
+    }
+</style>
+</body>
+</html>

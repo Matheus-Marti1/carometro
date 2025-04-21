@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Dashboard Administrativo')}">
+    <meta charset="UTF-8">
+    <title>Dashboard - Carômetro</title>
+</head>
+<body>
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <header th:replace="~{fragments/layout :: header}"></header>
+    <div th:replace="~{fragments/admin-layout :: drawer}"></div>
+
+    <!-- Conteúdo principal -->
+    <main class="mdl-layout__content">
+        <div class="page-content">
+            <div th:replace="~{fragments/layout :: messages}"></div>
+
+            <div class="dashboard-header">
+                <h2>
+                    <i class="material-icons dashboard-icon">dashboard</i>
+                    Dashboard Administrativo
+                </h2>
+                <div class="dashboard-info">
+                    <span class="dashboard-date" id="current-date"></span>
+                </div>
+            </div>
+
+            <!-- Estatísticas de Resumo -->
+            <div class="mdl-grid stats-summary">
+                <!-- Postagens -->
+                <div class="mdl-cell mdl-cell--6-col mdl-cell--12-col-tablet">
+                    <div class="mdl-card mdl-shadow--2dp dashboard-card">
+                        <div class="mdl-card__title">
+                            <i class="material-icons section-icon">article</i>
+                            <h2 class="mdl-card__title-text">Postagens</h2>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <ul class="stats-list">
+                                <li class="stats-item">
+                                    <div class="stats-label">
+                                        <i class="material-icons stats-icon">bar_chart</i>
+                                        Total:
+                                    </div>
+                                    <div class="stats-value" th:text="${totalPostagens}">0</div>
+                                </li>
+                                <li class="stats-item status-pending">
+                                    <div class="stats-label">
+                                        <i class="material-icons stats-icon">pending</i>
+                                        Pendentes:
+                                    </div>
+                                    <div class="stats-value" th:text="${postagensPendentes}">0</div>
+                                </li>
+                                <li class="stats-item status-approved">
+                                    <div class="stats-label">
+                                        <i class="material-icons stats-icon">check_circle</i>
+                                        Aprovadas:
+                                    </div>
+                                    <div class="stats-value" th:text="${postagensAprovadas}">0</div>
+                                </li>
+                                <li class="stats-item status-disabled">
+                                    <div class="stats-label">
+                                        <i class="material-icons stats-icon">disabled_by_default</i>
+                                        Desabilitadas:
+                                    </div>
+                                    <div class="stats-value" th:text="${postagensDesabilitadas != null ? postagensDesabilitadas : 0}">0</div>
+                                </li>
+                                <li class="stats-item status-rejected">
+                                    <div class="stats-label">
+                                        <i class="material-icons stats-icon">cancel</i>
+                                        Rejeitadas:
+                                    </div>
+                                    <div class="stats-value" th:text="${postagensRejeitadas}">0</div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="mdl-card__actions mdl-card--border">
+                            <a th:href="@{/admin/postagens}" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                                <i class="material-icons button-icon">manage_search</i>
+                                Gerenciar Postagens
+                            </a>
+                            <a th:href="@{/admin/postagens(status='PENDENTE')}" class="mdl-button mdl-js-button mdl-js-ripple-effect">
+                                <i class="material-icons button-icon">pending_actions</i>
+                                Ver Pendentes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estatísticas de Ex-Alunos -->
+                <div class="mdl-cell mdl-cell--6-col mdl-cell--12-col-tablet">
+                    <div class="mdl-card mdl-shadow--2dp dashboard-card">
+                        <div class="mdl-card__title">
+                            <i class="material-icons section-icon">people</i>
+                            <h2 class="mdl-card__title-text">Ex-Alunos</h2>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <ul class="stats-list">
+                                <li class="stats-item">
+                                    <div class="stats-label">
+                                        <i class="material-icons stats-icon">bar_chart</i>
+                                        Total:
+                                    </div>
+                                    <div class="stats-value" th:text="${totalExAlunos}">0</div>
+                                </li>
+                                <li class="stats-item status-pending">
+                                    <div class="stats-label">
+                                        <i class="material-icons stats-icon">person_add_disabled</i>
+                                        Pendentes:
+                                    </div>
+                                    <div class="stats-value" th:text="${exAlunosPendentes}">0</div>
+                                </li>
+                                <li class="stats-item status-approved">
+                                    <div class="stats-label">
+                                        <i class="material-icons stats-icon">how_to_reg</i>
+                                        Ativos:
+                                    </div>
+                                    <div class="stats-value" th:text="${exAlunosAtivos}">0</div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="mdl-card__actions mdl-card--border">
+                            <a th:href="@{/admin/ex-alunos}" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                                <i class="material-icons button-icon">manage_accounts</i>
+                                Gerenciar Ex-Alunos
+                            </a>
+                            <a th:href="@{/admin/ex-alunos(ativo=false)}" class="mdl-button mdl-js-button mdl-js-ripple-effect">
+                                <i class="material-icons button-icon">person_search</i>
+                                Ver Pendentes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Apenas para administradores -->
+                <div class="mdl-cell mdl-cell--12-col" sec:authorize="hasRole('ADMIN')">
+                    <div class="mdl-card mdl-shadow--2dp dashboard-card">
+                        <div class="mdl-card__title">
+                            <i class="material-icons section-icon">admin_panel_settings</i>
+                            <h2 class="mdl-card__title-text">Administração</h2>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <p class="admin-description">Gerencie usuários administrativos e configure o sistema Carômetro</p>
+                        </div>
+                        <div class="mdl-card__actions mdl-card--border">
+                            <a th:href="@{/admin/usuarios/novo}" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                                <i class="material-icons button-icon">person_add</i>
+                                Adicionar Novo Usuário Admin
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </main>
+</div>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Formatar e exibir data atual
+        const options = {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        };
+        const today = new Date();
+        document.getElementById('current-date').textContent = today.toLocaleDateString('pt-BR', options);
+
+        // Animação sutil para os cards
+        const cards = document.querySelectorAll('.dashboard-card');
+        cards.forEach((card, index) => {
+            setTimeout(() => {
+                card.classList.add('visible');
+            }, index * 100);
+        });
+    });
+</script>
+
+<style>
+    /* Cabeçalho do Dashboard */
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding: 0 16px;
+    }
+
+    .dashboard-header h2 {
+        color: #9e1b09;
+        display: flex;
+        align-items: center;
+        margin: 16px 0;
+        font-weight: 500;
+    }
+
+    .dashboard-icon {
+        margin-right: 8px;
+        color: #9e1b09;
+    }
+
+    .dashboard-date {
+        color: rgba(0, 0, 0, 0.54);
+        font-size: 14px;
+    }
+
+    /* Cards do Dashboard */
+    .dashboard-card {
+        width: 100%;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    .dashboard-card.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .dashboard-card .mdl-card__title {
+        color: #9e1b09;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        padding: 16px;
+    }
+
+    .section-icon {
+        margin-right: 8px;
+        color: #9e1b09;
+    }
+
+    /* Lista de Estatísticas */
+    .stats-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .stats-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 8px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        transition: background-color 0.2s ease;
+    }
+
+    .stats-item:last-child {
+        border-bottom: none;
+    }
+
+    .stats-item:hover {
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+
+    .stats-label {
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+    }
+
+    .stats-icon {
+        font-size: 20px;
+        margin-right: 8px;
+    }
+
+    .stats-value {
+        font-size: 18px;
+        font-weight: 500;
+    }
+
+    /* Status Colors */
+    .status-pending .stats-icon {
+        color: #FFC107;
+    }
+
+    .status-approved .stats-icon {
+        color: #4CAF50;
+    }
+
+    .status-rejected .stats-icon {
+        color: #F44336;
+    }
+
+    .status-pending .stats-value {
+        color: #FFA000;
+    }
+
+    .status-approved .stats-value {
+        color: #388E3C;
+    }
+
+    .status-rejected .stats-value {
+        color: #D32F2F;
+    }
+
+    /* Botões com ícones */
+    .button-icon {
+        margin-right: 8px;
+        vertical-align: middle;
+    }
+
+    /* Descrição administrativas */
+    .admin-description {
+        color: rgba(0, 0, 0, 0.54);
+        font-size: 16px;
+        margin: 8px 0;
+    }
+
+    /* Ajustes responsivos */
+    @media (max-width: 480px) {
+        .dashboard-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .dashboard-info {
+            margin-top: 8px;
+            margin-bottom: 16px;
+        }
+
+        .mdl-card__actions {
+            flex-direction: column;
+        }
+
+        .mdl-card__actions .mdl-button {
+            width: 100%;
+            margin-bottom: 8px;
+            text-align: left;
+            justify-content: flex-start;
+        }
+    }
+</style>
+</body>
+</html>

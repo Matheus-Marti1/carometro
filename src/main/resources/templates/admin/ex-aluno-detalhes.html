@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Detalhes do Ex-Aluno')}">
+    <meta charset="UTF-8">
+    <title>Detalhes do Ex-Aluno - Carômetro</title>
+</head>
+<body>
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <header th:replace="~{fragments/layout :: header}"></header>
+    <div th:replace="~{fragments/admin-layout :: drawer}"></div>
+
+    <!-- Conteúdo principal -->
+    <main class="mdl-layout__content">
+        <div class="page-content">
+            <div th:replace="~{fragments/layout :: messages}"></div>
+
+            <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--12-col">
+                    <a th:href="@{/admin/ex-alunos}" class="mdl-button mdl-js-button mdl-button--icon">
+                        <i class="material-icons">arrow_back</i>
+                    </a>
+                    <span style="margin-left: 10px; font-size: 24px; vertical-align: middle;">Detalhes do Ex-Aluno</span>
+                </div>
+
+                <!-- Perfil do Ex-Aluno -->
+                <div class="mdl-cell mdl-cell--6-col">
+                    <div class="mdl-card mdl-shadow--2dp" style="width: 100%;">
+                        <div class="mdl-card__title" style="display:block;">
+                            <h2 class="mdl-card__title-text">Perfil</h2>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <div class="info-section">
+                                <div class="info-label">Nome:</div>
+                                <div class="info-value" th:text="${exAluno.nome}">Nome do Ex-Aluno</div>
+                            </div>
+
+                            <div class="info-section">
+                                <div class="info-label">Email:</div>
+                                <div class="info-value" th:text="${exAluno.email}">email@example.com</div>
+                            </div>
+
+                            <div class="info-section">
+                                <div class="info-label">Curso:</div>
+                                <div class="info-value" th:text="${exAluno.curso}">Nome do Curso</div>
+                            </div>
+
+                            <div class="info-section">
+                                <div class="info-label">Ano de Formatura:</div>
+                                <div class="info-value" th:text="${exAluno.anoFormatura}">2020</div>
+                            </div>
+
+                            <div class="info-section">
+                                <div class="info-label">Status da Conta:</div>
+                                <div class="info-value">
+                                    <span th:if="${exAluno.ativo}" class="status-badge status-aprovada">Ativa</span>
+                                    <span th:unless="${exAluno.ativo}" class="status-badge status-pendente">Pendente</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mdl-card__actions mdl-card--border">
+                            <!-- Ações disponíveis para todos administradores e coordenadores -->
+                            <div th:if="${!exAluno.ativo}">
+                                <form th:action="@{/admin/ex-alunos/{id}/ativar(id=${exAluno.id})}" method="post" style="display: inline;">
+                                    <button type="submit" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect mdl-button--raised">
+                                        Ativar Cadastro
+                                    </button>
+                                </form>
+                            </div>
+
+                            <!-- Ações disponíveis apenas para administradores -->
+                            <div th:if="${exAluno.ativo}" sec:authorize="hasRole('ADMIN')">
+                                <form th:action="@{/admin/ex-alunos/{id}/desativar(id=${exAluno.id})}" method="post" style="display: inline;">
+                                    <button type="submit" class="mdl-button mdl-js-button mdl-js-ripple-effect">
+                                        Desativar Cadastro
+                                    </button>
+                                </form>
+                            </div>
+
+                            <!-- Botão de voltar -->
+                            <a th:href="@{/admin/ex-alunos}"
+                               class="mdl-button mdl-js-button mdl-js-ripple-effect">
+                                Voltar para Lista
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resumo da Postagem (se existir) -->
+                <div class="mdl-cell mdl-cell--6-col" th:if="${exAluno.postagem != null}">
+                    <div class="mdl-card mdl-shadow--2dp" style="width: 100%;">
+                        <div class="mdl-card__title">
+                            <h2 class="mdl-card__title-text">Postagem</h2>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <div class="info-section">
+                                <div class="info-label">Status:</div>
+                                <div class="info-value">
+                                    <span th:if="${exAluno.postagem.status.name() == 'APROVADA'}" class="status-badge status-aprovada">Aprovada</span>
+                                    <span th:if="${exAluno.postagem.status.name() == 'PENDENTE'}" class="status-badge status-pendente">Pendente</span>
+                                    <span th:if="${exAluno.postagem.status.name() == 'REJEITADA'}" class="status-badge status-rejeitada">Rejeitada</span>
+                                    <span th:if="${exAluno.postagem.status.name() == 'DESABILITADA'}" class="status-badge status-desabilitada">Desabilitada</span>
+                                </div>
+                            </div>
+
+                            <div class="info-section">
+                                <div class="info-label">Data de Criação:</div>
+                                <div class="info-value" th:text="${#temporals.format(exAluno.postagem.dataCriacao, 'dd/MM/yyyy HH:mm')}">01/01/2025</div>
+                            </div>
+
+                            <div class="info-section" th:if="${exAluno.postagem.dataAprovacao != null}">
+                                <div class="info-label">Data de Aprovação:</div>
+                                <div class="info-value" th:text="${#temporals.format(exAluno.postagem.dataAprovacao, 'dd/MM/yyyy HH:mm')}">01/01/2025</div>
+                            </div>
+
+                            <div class="info-section" th:if="${exAluno.postagem.aprovadoPor != null}">
+                                <div class="info-label">Aprovado por:</div>
+                                <div class="info-value" th:text="${exAluno.postagem.aprovadoPor.nome}">Nome do Aprovador</div>
+                            </div>
+                        </div>
+                        <div class="mdl-card__actions mdl-card--border">
+                            <a th:href="@{/admin/postagens/{id}(id=${exAluno.postagem.id})}"
+                               class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                                Ver Postagem Completa
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mensagem quando não há postagem -->
+                <div class="mdl-cell mdl-cell--6-col" th:if="${exAluno.postagem == null}">
+                    <div class="mdl-card mdl-shadow--2dp" style="width: 100%;">
+                        <div class="mdl-card__title">
+                            <h2 class="mdl-card__title-text">Postagem</h2>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <p>Este ex-aluno ainda não criou uma postagem.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detalhes da Postagem (se existir) -->
+                <div class="mdl-cell mdl-cell--12-col" th:if="${exAluno.postagem != null}">
+                    <div class="mdl-card mdl-shadow--2dp" style="width: 100%;">
+                        <div class="mdl-card__title">
+                            <h2 class="mdl-card__title-text">Detalhes da Postagem</h2>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <div class="info-section" th:if="${exAluno.postagem != null && exAluno.postagem.foto != null && exAluno.postagem.foto.length > 0}">
+                                <div class="info-label">Foto:</div>
+                                <div class="info-value">
+                                    <img th:src="@{/postagens/foto/{id}(id=${exAluno.postagem.id})}"
+                                         alt="Foto do Ex-Aluno"
+                                         style="max-width: 200px; max-height: 200px; object-fit: contain;">
+                                </div>
+                            </div>
+
+                            <!-- Histórico Profissional -->
+                            <div class="info-section" th:if="${exAluno.postagem.historicoProfissional != null && !exAluno.postagem.historicoProfissional.isEmpty()}">
+                                <div class="info-label">Histórico Profissional:</div>
+                                <div class="info-value content-box" th:text="${exAluno.postagem.historicoProfissional}">
+                                    Histórico profissional do ex-aluno...
+                                </div>
+                            </div>
+
+                            <!-- Comentário sobre a Faculdade -->
+                            <div class="info-section" th:if="${exAluno.postagem.comentarioFaculdade != null && !exAluno.postagem.comentarioFaculdade.isEmpty()}">
+                                <div class="info-label">Comentário sobre a Faculdade:</div>
+                                <div class="info-value content-box" th:text="${exAluno.postagem.comentarioFaculdade}">
+                                    Comentário sobre a faculdade...
+                                </div>
+                            </div>
+
+                            <!-- Comentário Livre -->
+                            <div class="info-section" th:if="${exAluno.postagem.comentarioLivre != null && !exAluno.postagem.comentarioLivre.isEmpty()}">
+                                <div class="info-label">Comentário Livre:</div>
+                                <div class="info-value content-box" th:text="${exAluno.postagem.comentarioLivre}">
+                                    Comentário livre...
+                                </div>
+                            </div>
+
+                            <!-- Links Pessoais -->
+                            <div class="info-section" th:if="${!exAluno.postagem.linksPessoais.isEmpty()}">
+                                <div class="info-label">Links Pessoais:</div>
+                                <div class="info-value">
+                                    <ul class="mdl-list links-list">
+                                        <li class="mdl-list__item" th:each="link : ${exAluno.postagem.linksPessoais}">
+                                            <span class="mdl-list__item-primary-content">
+                                                <i class="material-icons mdl-list__item-icon">link</i>
+                                                <a th:href="${link.url}" target="_blank" th:text="${link.titulo}">Link</a>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </main>
+</div>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+<style>
+    .info-section {
+        margin-bottom: 16px;
+    }
+    .info-label {
+        font-weight: 500;
+        color: rgba(0,0,0,.54);
+    }
+    .info-value {
+        margin-top: 4px;
+    }
+    .status-badge {
+        padding: 3px 8px;
+        border-radius: 4px;
+        color: white;
+        font-size: 12px;
+    }
+    .status-aprovada {
+        background-color: #66BB6A;
+    }
+    .status-pendente {
+        background-color: #FFA726;
+    }
+    .status-rejeitada {
+        background-color: #EF5350;
+    }
+    .status-desabilitada {
+        background-color: #9E9E9E;
+    }
+    .content-box {
+        border: 1px solid #e0e0e0;
+        padding: 16px;
+        border-radius: 4px;
+        background-color: #f5f5f5;
+        white-space: pre-wrap;
+    }
+    .links-list {
+        padding: 0;
+    }
+    .links-list .mdl-list__item {
+        padding: 8px 16px;
+    }
+    .links-list a {
+        text-decoration: none;
+        color: #3f51b5;
+    }
+    .links-list a:hover {
+        text-decoration: underline;
+    }
+    .photo-fallback {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border: 1px dashed #ccc;
+        padding: 20px;
+        border-radius: 4px;
+        background-color: #f9f9f9;
+    }
+    .photo-fallback i {
+        font-size: 48px;
+        color: #9e9e9e;
+    }
+    .photo-fallback span {
+        margin-top: 8px;
+        color: #757575;
+    }
+</style>
+</body>
+</html>

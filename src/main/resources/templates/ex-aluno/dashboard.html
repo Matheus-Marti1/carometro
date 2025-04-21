@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Dashboard do Ex-Aluno')}">
+    <meta charset="UTF-8">
+    <title>Dashboard do Ex-Aluno</title>
+</head>
+<body>
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <div th:replace="~{fragments/layout :: header}"></div>
+    <div th:replace="~{fragments/layout :: drawer}"></div>
+
+    <!-- Conteúdo principal -->
+    <main class="mdl-layout__content">
+        <div class="page-content">
+            <div th:replace="~{fragments/layout :: messages}"></div>
+
+            <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--12-col">
+                    <h1 class="page-title">Bem-vindo ao Carômetro!</h1>
+
+                    <!-- Informações Básicas -->
+                    <div class="mdl-card mdl-shadow--2dp welcome-card">
+                        <div class="mdl-card__title mdl-card--colored">
+                            <h2 class="mdl-card__title-text">Suas Informações</h2>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <div class="info-block">
+                                <div class="info-label">Nome:</div>
+                                <div class="info-value" th:text="${exAlunoDTO.nome()}">Nome do Ex-Aluno</div>
+                            </div>
+                            <div class="info-block">
+                                <div class="info-label">Curso:</div>
+                                <div class="info-value" th:text="${exAlunoDTO.curso()}">Curso</div>
+                            </div>
+                            <div class="info-block">
+                                <div class="info-label">Ano de Formatura:</div>
+                                <div class="info-value" th:text="${exAlunoDTO.anoFormatura()}">Ano</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Status da Postagem -->
+                    <div class="mdl-card mdl-shadow--2dp status-card" th:if="${postagem != null}">
+                        <div class="mdl-card__title">
+                            <h2 class="mdl-card__title-text">Sua História</h2>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <p>Você já compartilhou sua história no Carômetro.</p>
+                            <div class="action-buttons">
+                                <a th:href="@{/ex-aluno/postagem/editar}" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">
+                                    <i class="material-icons">edit</i> Editar História
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Criar Nova Postagem -->
+                    <div class="mdl-card mdl-shadow--2dp create-card" th:if="${postagem == null}">
+                        <div class="mdl-card__title">
+                            <h2 class="mdl-card__title-text">Compartilhe Sua História</h2>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <p>Você ainda não compartilhou sua história profissional no Carômetro.</p>
+                            <p>Conte para a comunidade sobre sua trajetória após a formatura!</p>
+                            <div class="action-buttons">
+                                <a href="#" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+                                    <i class="material-icons">add_circle</i> Criar História
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Histórias Recentes -->
+                    <div class="mdl-card mdl-shadow--2dp explore-card">
+                        <div class="mdl-card__title">
+                            <h2 class="mdl-card__title-text">Explore Histórias</h2>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <p>Descubra histórias profissionais de outros ex-alunos da Fatec.</p>
+                            <div class="action-buttons">
+                                <a th:href="@{/postagens/publicas}" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+                                    <i class="material-icons">people</i> Ver Histórias de Ex-Alunos
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div th:replace="~{fragments/layout :: footer}"></div>
+        </div>
+    </main>
+</div>
+
+<style>
+    /* Estilos gerais */
+    .page-title {
+        color: #3f51b5;
+        margin-bottom: 24px;
+        font-weight: 400;
+        text-align: center;
+    }
+
+    .mdl-card {
+        width: 100%;
+        margin-bottom: 24px;
+    }
+
+    .mdl-card__title.mdl-card--colored {
+        background-color: #3f51b5;
+        color: white;
+    }
+
+    /* Informações pessoais */
+    .welcome-card .mdl-card__supporting-text {
+        padding-bottom: 24px;
+    }
+
+    .info-block {
+        margin-bottom: 12px;
+        display: flex;
+    }
+
+    .info-label {
+        font-weight: 500;
+        width: 150px;
+        flex-shrink: 0;
+    }
+
+    .info-value {
+        flex-grow: 1;
+    }
+
+    /* Cartões de ação */
+    .status-card .mdl-card__title,
+    .create-card .mdl-card__title,
+    .explore-card .mdl-card__title {
+        background-color: #f5f5f5;
+    }
+
+    .status-card .mdl-card__title-text {
+        color: #4CAF50;
+    }
+
+    .create-card .mdl-card__title-text {
+        color: #FF9800;
+    }
+
+    .explore-card .mdl-card__title-text {
+        color: #2196F3;
+    }
+
+    /* Botões */
+    .action-buttons {
+        margin-top: 16px;
+    }
+
+    .action-buttons .mdl-button {
+        margin-right: 8px;
+        margin-bottom: 8px;
+    }
+
+    .action-buttons .mdl-button i {
+        margin-right: 8px;
+    }
+
+    /* Responsividade */
+    @media (max-width: 839px) {
+        .info-block {
+            flex-direction: column;
+        }
+
+        .info-label {
+            margin-bottom: 4px;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar componentes do MDL
+        if (typeof componentHandler !== 'undefined') {
+            componentHandler.upgradeAllRegistered();
+        }
+    });
+</script>
+</body>
+</html>

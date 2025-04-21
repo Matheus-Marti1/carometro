@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Meu Perfil')}">
+    <meta charset="UTF-8">
+    <title>Meu Perfil</title>
+</head>
+<body>
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <div th:replace="~{fragments/layout :: header}"></div>
+    <div th:replace="~{fragments/layout :: drawer}"></div>
+
+    <!-- Conteúdo principal -->
+    <main class="mdl-layout__content">
+        <div class="page-content">
+            <div th:replace="~{fragments/layout :: messages}"></div>
+
+            <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--12-col">
+                    <div class="page-header">
+                        <a th:href="@{/ex-aluno/dashboard}" class="mdl-button mdl-button--colored mdl-js-button mdl-button--icon back-button">
+                            <i class="material-icons">arrow_back</i>
+                        </a>
+                        <h1 class="page-title">Meu Perfil</h1>
+                    </div>
+
+                    <div class="mdl-grid">
+                        <!-- Informações do perfil -->
+                        <div class="mdl-cell mdl-cell--6-col mdl-cell--12-col-tablet">
+                            <div class="mdl-card mdl-shadow--2dp card-full-width">
+                                <div class="mdl-card__title mdl-card--colored">
+                                    <h2 class="mdl-card__title-text">Informações Pessoais</h2>
+                                </div>
+                                <div class="mdl-card__supporting-text">
+                                    <div class="info-container">
+                                        <div class="info-row">
+                                            <div class="info-label">Nome:</div>
+                                            <div class="info-value" th:text="${exAlunoDTO.nome()}">Nome Completo</div>
+                                        </div>
+
+                                        <div class="info-row">
+                                            <div class="info-label">Email:</div>
+                                            <div class="info-value" th:text="${exAlunoDTO.email()}">email@example.com</div>
+                                        </div>
+
+                                        <div class="info-row">
+                                            <div class="info-label">Curso:</div>
+                                            <div class="info-value" th:text="${exAlunoDTO.curso()}">Curso</div>
+                                        </div>
+
+                                        <div class="info-row">
+                                            <div class="info-label">Ano de Formatura:</div>
+                                            <div class="info-value" th:text="${exAlunoDTO.anoFormatura()}">2023</div>
+                                        </div>
+
+                                        <div class="info-row">
+                                            <div class="info-label">RA:</div>
+                                            <div class="info-value" th:text="${exAlunoDTO.ra()}">1234567</div>
+                                        </div>
+
+                                        <div class="info-row">
+                                            <div class="info-label">Status da Conta:</div>
+                                            <div class="info-value account-status">
+                                                <i class="material-icons">check_circle</i>
+                                                <span th:text="${exAluno.verificado} ? 'Verificado' : 'Pendente de verificação'">Verificado</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Segurança da Conta -->
+                        <div class="mdl-cell mdl-cell--6-col mdl-cell--12-col-tablet">
+                            <div class="mdl-card mdl-shadow--2dp card-full-width">
+                                <div class="mdl-card__title mdl-card--colored">
+                                    <h2 class="mdl-card__title-text">Segurança</h2>
+                                </div>
+                                <div class="mdl-card__supporting-text">
+                                    <div class="security-section">
+                                        <div class="section-title">
+                                            <i class="material-icons">lock</i>
+                                            <span>Senha</span>
+                                        </div>
+                                        <div class="section-content">
+                                            <p>Última alteração: <span>01/04/2025</span></p>
+                                        </div>
+                                        <div class="section-action">
+                                            <a href="#" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+                                                Alterar Senha
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <div class="security-section">
+                                        <div class="section-title">
+                                            <i class="material-icons">email</i>
+                                            <span>Email de Recuperação</span>
+                                        </div>
+                                        <div class="section-content">
+                                            <p>Email secundário: <span th:text="${exAlunoDTO.email()}">email@example.com</span></p>
+                                        </div>
+                                        <div class="section-action">
+                                            <a href="#" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+                                                Atualizar Email
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Configurações de Privacidade -->
+                            <div class="mdl-card mdl-shadow--2dp card-full-width privacy-card">
+                                <div class="mdl-card__title mdl-card--colored">
+                                    <h2 class="mdl-card__title-text">Configurações de Privacidade</h2>
+                                </div>
+                                <div class="mdl-card__supporting-text">
+                                    <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-1">
+                                        <input type="checkbox" id="switch-1" class="mdl-switch__input" checked>
+                                        <span class="mdl-switch__label">Mostrar email na minha história pública</span>
+                                    </label>
+
+                                    <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-2">
+                                        <input type="checkbox" id="switch-2" class="mdl-switch__input" checked>
+                                        <span class="mdl-switch__label">Receber notificações por email</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div th:replace="~{fragments/layout :: footer}"></div>
+        </div>
+    </main>
+</div>
+
+<style>
+    /* Estilos gerais */
+    .page-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    .back-button {
+        margin-right: 16px;
+    }
+
+    .page-title {
+        color: #3f51b5;
+        margin: 0;
+        font-weight: 400;
+    }
+
+    .card-full-width {
+        width: 100%;
+    }
+
+    .mdl-card__title.mdl-card--colored {
+        background-color: #3f51b5;
+        color: white;
+    }
+
+    /* Informações do perfil */
+    .info-container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .info-row {
+        display: flex;
+        margin-bottom: 16px;
+        align-items: baseline;
+    }
+
+    .info-label {
+        font-weight: 500;
+        color: rgba(0, 0, 0, 0.54);
+        width: 150px;
+        flex-shrink: 0;
+    }
+
+    .info-value {
+        color: rgba(0, 0, 0, 0.87);
+    }
+
+    .account-status {
+        display: flex;
+        align-items: center;
+        color: #4CAF50;
+    }
+
+    .account-status i {
+        margin-right: 5px;
+        font-size: 18px;
+    }
+
+    /* Segurança */
+    .security-section {
+        padding: 16px 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .security-section:last-child {
+        border-bottom: none;
+    }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: rgba(0, 0, 0, 0.87);
+    }
+
+    .section-title i {
+        margin-right: 8px;
+        color: #3f51b5;
+    }
+
+    .section-content {
+        margin-bottom: 16px;
+        color: rgba(0, 0, 0, 0.7);
+    }
+
+    .section-content p {
+        margin: 5px 0;
+    }
+
+    /* Privacidade */
+    .privacy-card {
+        margin-top: 24px;
+    }
+
+    .mdl-switch {
+        width: 100%;
+        margin-bottom: 16px;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar componentes do MDL
+        if (typeof componentHandler !== 'undefined') {
+            componentHandler.upgradeAllRegistered();
+        }
+    });
+</script>
+</body>
+</html>

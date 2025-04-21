@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Postagens Públicas')}">
+    <title>Postagens Públicas - Carômetro</title>
+</head>
+<body>
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <div th:replace="~{fragments/layout :: header}"></div>
+    <div th:replace="~{fragments/layout :: drawer}"></div>
+
+    <!-- Conteúdo principal -->
+    <main class="mdl-layout__content">
+        <div class="page-content">
+            <div th:replace="~{fragments/layout :: messages}"></div>
+
+            <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--12-col">
+                    <h1>Postagens de Ex-Alunos</h1>
+
+                    <!-- Filtros -->
+                    <div class="mdl-card mdl-shadow--2dp filtro-card">
+                        <div class="mdl-card__title">
+                            <h2 class="mdl-card__title-text">Filtros</h2>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <form th:action="@{/postagens/publicas}" method="get" th:object="${filtro}">
+                                <div class="mdl-grid">
+                                    <div class="mdl-cell mdl-cell--4-col">
+                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                            <select class="mdl-textfield__input" id="curso" name="curso" th:field="*{curso}">
+                                                <option value="">Todos os Cursos</option>
+                                                <option th:each="c : ${cursos}" th:value="${c}" th:text="${c}"></option>
+                                            </select>
+                                            <label class="mdl-textfield__label" for="curso">Curso</label>
+                                        </div>
+                                    </div>
+                                    <div class="mdl-cell mdl-cell--4-col">
+                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                            <select class="mdl-textfield__input" id="anoFormatura" name="anoFormatura" th:field="*{anoFormatura}">
+                                                <option value="">Todos os Anos</option>
+                                                <option th:each="a : ${anosFormatura}" th:value="${a}" th:text="${a}"></option>
+                                            </select>
+                                            <label class="mdl-textfield__label" for="anoFormatura">Ano de Formatura</label>
+                                        </div>
+                                    </div>
+                                    <div class="mdl-cell mdl-cell--4-col">
+                                        <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect mdl-button--raised" type="submit">
+                                            <i class="material-icons">filter_list</i> Filtrar
+                                        </button>
+                                        <a th:href="@{/postagens/publicas}" class="mdl-button mdl-js-button mdl-js-ripple-effect">
+                                            <i class="material-icons">clear</i> Limpar
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!-- Campos ocultos para manter a paginação ao filtrar -->
+                                <input type="hidden" name="page" value="0" />
+                                <input type="hidden" name="size" th:value="${page != null ? page.size : 9}" />
+                                <input type="hidden" name="sort" th:value="${param.sort != null ? param.sort[0] : 'exAluno.nome'}" />
+                                <input type="hidden" name="direction" th:value="${param.direction != null ? param.direction[0] : 'asc'}" />
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Resultados -->
+                    <div th:if="${postagens.isEmpty()}" class="mdl-card mdl-shadow--2dp" style="width: 100%;">
+                        <div class="mdl-card__title">
+                            <h2 class="mdl-card__title-text">Nenhuma postagem encontrada</h2>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            Não existem postagens que correspondam aos filtros selecionados.
+                        </div>
+                    </div>
+
+                    <div class="mdl-grid">
+                        <div class="mdl-cell mdl-cell--4-col" th:each="postagem : ${postagens}">
+                            <!-- Novo design de card com foto de perfil em círculo -->
+                            <div class="mdl-card mdl-shadow--2dp ex-aluno-card">
+                                <div class="card-header">
+                                    <div class="foto-perfil-container" th:attr="data-postagem-id=${postagem.id()}">
+                                        <!-- A foto será aplicada via JavaScript -->
+                                    </div>
+                                    <div class="card-header-info">
+                                        <h2 class="card-title" th:text="${postagem.exAluno().nome()}">Nome do Ex-Aluno</h2>
+                                        <div class="card-subtitle">
+                                            <span th:text="${postagem.exAluno().curso()}">Curso</span>
+                                            <span class="separator">•</span>
+                                            <span th:text="${postagem.exAluno().anoFormatura()}">Ano</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mdl-card__actions mdl-card--border">
+                                    <a th:href="@{/postagens/publicas/{id}(id=${postagem.id()})}" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                                        Ver Detalhes
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paginação permanece a mesma -->
+                    <div class="mdl-grid" th:if="${page != null && page.totalPages > 1}">
+                        <div class="mdl-cell mdl-cell--12-col pagination-container">
+                            <ul class="mdl-pagination">
+                                <!-- Botão Primeira Página -->
+                                <li th:class="${currentPage == 0} ? 'disabled' : ''">
+                                    <a th:href="@{/postagens/publicas(
+                                        page=0,
+                                        size=${page.size},
+                                        sort=${param.sort != null ? param.sort[0] : 'exAluno.nome'},
+                                        direction=${param.direction != null ? param.direction[0] : 'asc'},
+                                        curso=${filtro.curso},
+                                        anoFormatura=${filtro.anoFormatura})}"
+                                       class="mdl-button mdl-js-button"
+                                       th:classappend="${currentPage == 0} ? 'mdl-button--disabled' : ''">
+                                        <i class="material-icons">first_page</i>
+                                    </a>
+                                </li>
+
+                                <!-- Restante dos botões de paginação permanecem iguais -->
+                                <!-- ... -->
+
+                                <!-- Botão Última Página -->
+                                <li th:class="${currentPage == page.totalPages - 1} ? 'disabled' : ''">
+                                    <a th:href="@{/postagens/publicas(
+                                        page=${page.totalPages - 1},
+                                        size=${page.size},
+                                        sort=${param.sort != null ? param.sort[0] : 'exAluno.nome'},
+                                        direction=${param.direction != null ? param.direction[0] : 'asc'},
+                                        curso=${filtro.curso},
+                                        anoFormatura=${filtro.anoFormatura})}"
+                                       class="mdl-button mdl-js-button"
+                                       th:classappend="${currentPage == page.totalPages - 1} ? 'mdl-button--disabled' : ''">
+                                        <i class="material-icons">last_page</i>
+                                    </a>
+                                </li>
+                            </ul>
+
+                            <!-- Informações da Página -->
+                            <div class="page-info">
+                                <span>
+                                    Mostrando
+                                    <span th:text="${page.numberOfElements}">9</span> de
+                                    <span th:text="${page.totalElements}">100</span> postagens
+                                    (Página <span th:text="${currentPage + 1}">1</span> de
+                                    <span th:text="${page.totalPages}">10</span>)
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div th:replace="~{fragments/layout :: footer}"></div>
+        </div>
+    </main>
+</div>
+
+<!-- Estilos atualizados -->
+<style>
+    /* Estilos para os dropdowns */
+    .mdl-textfield--floating-label select.mdl-textfield__input {
+        padding-top: 20px;
+        height: auto;
+    }
+
+    .mdl-textfield--floating-label .mdl-textfield__label {
+        top: 4px !important;
+        font-size: 12px !important;
+        color: rgba(0,0,0,.56) !important;
+        transform: none !important;
+    }
+
+    .mdl-textfield__input {
+        min-height: 32px;
+    }
+
+    /* Estilos para paginação */
+    .pagination-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 24px;
+    }
+
+    .mdl-pagination {
+        display: flex;
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .mdl-pagination li {
+        margin: 0 4px;
+    }
+
+    .mdl-pagination li.disabled a {
+        color: rgba(0, 0, 0, 0.26);
+        cursor: default;
+    }
+
+    .page-info {
+        margin-top: 12px;
+        color: rgba(0, 0, 0, 0.54);
+    }
+
+    /* Novos estilos para os cards de ex-alunos */
+    .ex-aluno-card {
+        width: 100%;
+        min-height: 120px;
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 16px;
+    }
+
+    .card-header {
+        padding: 16px;
+        display: flex;
+        align-items: center;
+    }
+
+    .foto-perfil-container {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background-size: cover;
+        background-position: center;
+        background-color: #e0e0e0;
+        margin-right: 16px;
+        flex-shrink: 0;
+        border: 2px solid #3f51b5;
+    }
+
+    .card-header-info {
+        flex-grow: 1;
+    }
+
+    .card-title {
+        font-size: 18px;
+        margin: 0 0 8px 0;
+        color: #3f51b5;
+    }
+
+    .card-subtitle {
+        font-size: 14px;
+        color: rgba(0, 0, 0, 0.54);
+    }
+
+    .separator {
+        margin: 0 5px;
+    }
+
+    .filtro-card {
+        width: 100%;
+        margin-bottom: 24px;
+    }
+
+    /* Responsividade */
+    @media (max-width: 839px) {
+        .mdl-cell--4-col {
+            width: 100%;
+            margin: 8px 0;
+        }
+
+        .card-header {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .foto-perfil-container {
+            margin-right: 0;
+            margin-bottom: 16px;
+        }
+    }
+</style>
+
+<!-- Script modificado para aplicar o background-image nos círculos de foto -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Seleciona todos os elementos com a classe foto-perfil-container
+        var fotoElements = document.querySelectorAll('.foto-perfil-container');
+
+        // Itera sobre cada elemento
+        fotoElements.forEach(function(element) {
+            // Obtém o ID da postagem do atributo data-postagem-id
+            var postagemId = element.getAttribute('data-postagem-id');
+            if (postagemId) {
+                // Aplica o estilo background-image com a URL da foto
+                element.style.backgroundImage = "url('/postagens/foto/" + postagemId + "')";
+
+                // Adiciona evento de erro para tratar imagens que falham ao carregar
+                var img = new Image();
+                img.onerror = function() {
+                    element.style.backgroundImage = "url('https://via.placeholder.com/80x80?text=Perfil')";
+                };
+                img.src = "/postagens/foto/" + postagemId;
+            }
+        });
+    });
+</script>
+</body>
+</html>

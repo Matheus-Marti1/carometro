@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="pt-br">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' - Carômetro'">Carômetro - Fatec Zona Leste</title>
+
+    <!-- Material Design Lite com tema personalizado -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.red-pink.min.css">
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+
+    <!-- CSS Override para tema personalizado -->
+    <style>
+        /* Cores temáticas personalizadas */
+        .mdl-layout__header,
+        .mdl-layout__drawer > .mdl-layout-title,
+        .mdl-card__title.mdl-card--colored,
+        .mdl-button--raised.mdl-button--colored {
+            background-color: #9e1b09;
+            color: white;
+        }
+
+        /* Cores do cabeçalho */
+        .header-logo-link {
+            color: white !important;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            opacity: 0.95;
+            transition: opacity 0.2s ease;
+        }
+
+        .header-logo-link:hover {
+            opacity: 1;
+            text-shadow: 0 0 5px rgba(255,255,255,0.3);
+        }
+
+        /* Correção de cores em elementos específicos */
+        .mdl-button--raised.mdl-button--colored {
+            background-color: #9e1b09;
+        }
+
+        .mdl-button--raised.mdl-button--colored:hover {
+            background-color: #c42311;
+        }
+
+        .ex-aluno-card .mdl-card__title {
+            background: linear-gradient(to right, #9e1b09, #d32f2f);
+        }
+
+        .visitor-card .mdl-card__title {
+            background: linear-gradient(to right, #00796b, #26a69a);
+        }
+
+        .coordinator-card .mdl-card__title {
+            background: linear-gradient(to right, #e64a19, #ff7043);
+        }
+
+        /* Estilização de links sem sublinhado */
+        a.mdl-navigation__link,
+        a.mdl-button {
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .mdl-navigation__link:hover {
+            color: #ff9e80 !important;
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        a:not(.mdl-button):not(.mdl-navigation__link):not(.header-logo-link) {
+            color: #9e1b09;
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 1px solid transparent;
+            transition: border-bottom 0.2s ease;
+        }
+
+        a:not(.mdl-button):not(.mdl-navigation__link):not(.header-logo-link):hover {
+            border-bottom: 1px solid #9e1b09;
+        }
+
+        .mdl-layout__tab-bar {
+            background-color: #9e1b09;
+        }
+
+        .section-title:after {
+            background: #9e1b09;
+        }
+    </style>
+</head>
+<body>
+<!-- Header/Navbar -->
+<header th:fragment="header" class="mdl-layout__header">
+    <div class="mdl-layout__header-row">
+        <!-- Logo/Título com link para a página inicial -->
+        <span class="mdl-layout-title">
+            <a th:href="@{/}" class="header-logo-link">Carômetro - Fatec ZL</a>
+        </span>
+        <div class="mdl-layout-spacer"></div>
+        <nav class="mdl-navigation mdl-layout--large-screen-only">
+            <a class="mdl-navigation__link" th:href="@{/}">
+                <i class="material-icons nav-icon">home</i> Início
+            </a>
+            <a class="mdl-navigation__link" th:href="@{/postagens/publicas}">
+                <i class="material-icons nav-icon">library_books</i> Histórias
+            </a>
+
+            <!-- Links para usuários não autenticados -->
+            <a class="mdl-navigation__link" sec:authorize="isAnonymous()" th:href="@{/login}">
+                <i class="material-icons nav-icon">login</i> Entrar
+            </a>
+            <a class="mdl-navigation__link" sec:authorize="isAnonymous()" th:href="@{/registro}">
+                <i class="material-icons nav-icon">person_add</i> Registrar-se
+            </a>
+
+            <!-- Link do Dashboard baseado no papel do usuário -->
+            <a class="mdl-navigation__link" sec:authorize="hasRole('ADMIN')" th:href="@{/admin/dashboard}">
+                <i class="material-icons nav-icon">admin_panel_settings</i> Administração
+            </a>
+            <a class="mdl-navigation__link" sec:authorize="hasRole('COORDENADOR')" th:href="@{/coordenador/dashboard}">
+                <i class="material-icons nav-icon">school</i> Coordenação
+            </a>
+            <a class="mdl-navigation__link" sec:authorize="hasRole('EX_ALUNO')" th:href="@{/ex-aluno/dashboard}">
+                <i class="material-icons nav-icon">person</i> Meu Perfil
+            </a>
+
+            <!-- Logout para usuários autenticados -->
+            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display: inline;">
+                <button type="submit" class="mdl-navigation__link logout-link" style="border: none; background: none; width: 100%; text-align: left;">
+                    <i class="material-icons nav-icon">exit_to_app</i> Sair
+                </button>
+            </form>
+        </nav>
+
+        <!-- Badge com nome do usuário logado -->
+        <div sec:authorize="isAuthenticated()" class="user-badge">
+            <span class="material-icons">account_circle</span>
+            <span sec:authentication="name"></span>
+        </div>
+    </div>
+</header>
+
+<!-- Menu lateral para dispositivos móveis -->
+<div th:fragment="drawer" class="mdl-layout__drawer">
+    <span class="mdl-layout-title">Carômetro<br><small>Fatec Zona Leste</small></span>
+    <nav class="mdl-navigation">
+        <a class="mdl-navigation__link" th:href="@{/}">
+            <i class="material-icons nav-icon">home</i> Início
+        </a>
+        <a class="mdl-navigation__link" th:href="@{/postagens/publicas}">
+            <i class="material-icons nav-icon">library_books</i> Histórias
+        </a>
+
+        <!-- Links para usuários não autenticados -->
+        <div sec:authorize="isAnonymous()" class="drawer-section">
+            <div class="drawer-section-title">Acesso</div>
+            <a class="mdl-navigation__link" th:href="@{/login}">
+                <i class="material-icons nav-icon">login</i> Entrar
+            </a>
+            <a class="mdl-navigation__link" th:href="@{/registro}">
+                <i class="material-icons nav-icon">person_add</i> Registrar-se
+            </a>
+        </div>
+
+        <!-- Links para usuários autenticados -->
+        <div sec:authorize="isAuthenticated()" class="drawer-section">
+            <div class="drawer-section-title">Sua Conta</div>
+
+            <!-- Links específicos por papel -->
+            <a class="mdl-navigation__link" sec:authorize="hasRole('ADMIN')" th:href="@{/admin/dashboard}">
+                <i class="material-icons nav-icon">admin_panel_settings</i> Administração
+            </a>
+            <a class="mdl-navigation__link" sec:authorize="hasRole('ADMIN')" th:href="@{/admin/postagens/pendentes}">
+                <i class="material-icons nav-icon">pending_actions</i> Postagens Pendentes
+            </a>
+
+            <a class="mdl-navigation__link" sec:authorize="hasRole('COORDENADOR')" th:href="@{/coordenador/dashboard}">
+                <i class="material-icons nav-icon">school</i> Coordenação
+            </a>
+            <a class="mdl-navigation__link" sec:authorize="hasRole('COORDENADOR')" th:href="@{/coordenador/postagens/aprovadas}">
+                <i class="material-icons nav-icon">verified</i> Postagens Aprovadas
+            </a>
+
+            <a class="mdl-navigation__link" sec:authorize="hasRole('EX_ALUNO')" th:href="@{/ex-aluno/dashboard}">
+                <i class="material-icons nav-icon">dashboard</i> Meu Dashboard
+            </a>
+            <a class="mdl-navigation__link" sec:authorize="hasRole('EX_ALUNO')" th:href="@{/ex-aluno/perfil}">
+                <i class="material-icons nav-icon">person</i> Meu Perfil
+            </a>
+            <a class="mdl-navigation__link" sec:authorize="hasRole('EX_ALUNO')" th:href="@{/ex-aluno/postagem/editar}">
+                <i class="material-icons nav-icon">edit</i> Editar Minha História
+            </a>
+
+            <!-- Logout -->
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="mdl-navigation__link logout-link" style="border: none; background: none; width: 100%; text-align: left;">
+                    <i class="material-icons nav-icon">exit_to_app</i> Sair
+                </button>
+            </form>
+        </div>
+    </nav>
+</div>
+
+<!-- Messages (success/error) -->
+<div th:fragment="messages">
+    <div th:if="${mensagem}" class="mdl-card mdl-card--border mdl-shadow--2dp message-card success-message">
+        <div class="mdl-card__title">
+            <i class="material-icons message-icon">check_circle</i>
+            <h2 class="mdl-card__title-text">Sucesso!</h2>
+        </div>
+        <div class="mdl-card__supporting-text" th:text="${mensagem}">
+            Mensagem de sucesso aqui
+        </div>
+        <div class="mdl-card__actions">
+            <button class="mdl-button mdl-js-button mdl-button--icon" onclick="this.parentElement.parentElement.style.display='none'">
+                <i class="material-icons">close</i>
+            </button>
+        </div>
+    </div>
+
+    <div th:if="${erro}" class="mdl-card mdl-card--border mdl-shadow--2dp message-card error-message">
+        <div class="mdl-card__title">
+            <i class="material-icons message-icon">error</i>
+            <h2 class="mdl-card__title-text">Erro</h2>
+        </div>
+        <div class="mdl-card__supporting-text" th:text="${erro}">
+            Mensagem de erro aqui
+        </div>
+        <div class="mdl-card__actions">
+            <button class="mdl-button mdl-js-button mdl-button--icon" onclick="this.parentElement.parentElement.style.display='none'">
+                <i class="material-icons">close</i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer th:fragment="footer" class="mdl-mini-footer">
+    <div class="mdl-mini-footer__left-section">
+        <div class="mdl-logo">Carômetro - Fatec Zona Leste</div>
+        <ul class="mdl-mini-footer__link-list">
+            <li><a href="#">Sobre</a></li>
+            <li><a href="#">Contato</a></li>
+            <li><a href="#">Política de Privacidade</a></li>
+            <li>&copy; 2025 FATEC-ZL</li>
+        </ul>
+    </div>
+    <div class="mdl-mini-footer__right-section">
+        <a href="#top" class="back-to-top">
+            <i class="material-icons">arrow_upward</i> Topo
+        </a>
+    </div>
+</footer>
+
+<!-- Scripts -->
+<div th:fragment="scripts">
+    <script th:src="@{/js/scripts.js}"></script>
+    <script>
+        // Função para fechar mensagens de alerta automaticamente
+        document.addEventListener('DOMContentLoaded', function() {
+            var messages = document.querySelectorAll('.message-card');
+            if (messages.length > 0) {
+                setTimeout(function() {
+                    messages.forEach(function(message) {
+                        message.style.opacity = '0';
+                        setTimeout(function() {
+                            message.style.display = 'none';
+                        }, 500);
+                    });
+                }, 5000); // 5 segundos
+            }
+
+            // Marcar links ativos com base na URL atual
+            var currentPath = window.location.pathname;
+            document.querySelectorAll('.mdl-navigation__link').forEach(function(link) {
+                var href = link.getAttribute('href');
+                // Remove o contexto da aplicação do href para comparação
+                if (href.startsWith('/')) {
+                    href = href.replace(/^\/[^\/]+/, '');
+                }
+                // Remove o contexto da aplicação do currentPath para comparação
+                if (currentPath.startsWith('/')) {
+                    currentPath = currentPath.replace(/^\/[^\/]+/, '');
+                }
+
+                if (currentPath === href ||
+                    (href !== '/' && currentPath.startsWith(href)) ||
+                    (href === '/' && currentPath === '')) {
+                    link.classList.add('is-active');
+                }
+            });
+        });
+    </script>
+</div>
+
+<!-- CSS adicional para melhorias -->
+<style>
+    /* Estilo para o cabeçalho */
+    .user-badge {
+        display: flex;
+        align-items: center;
+        margin-left: 16px;
+        padding: 4px 10px;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 16px;
+        color: white;
+        font-size: 14px;
+    }
+
+    .user-badge .material-icons {
+        margin-right: 8px;
+        font-size: 20px;
+    }
+
+    /* Menu lateral */
+    .drawer-section {
+        border-top: 1px solid #e0e0e0;
+        margin-top: 8px;
+        padding-top: 8px;
+    }
+
+    .drawer-section-title {
+        padding: 8px 16px;
+        color: rgba(0, 0, 0, 0.54);
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .nav-icon {
+        margin-right: 16px;
+        vertical-align: middle;
+    }
+
+    /* Links */
+    .mdl-navigation__link.is-active {
+        background-color: rgba(255, 255, 255, 0.12);
+        font-weight: 500;
+        position: relative;
+    }
+
+    .mdl-navigation__link.is-active::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background-color: #ff9e80;
+    }
+
+    .logout-link {
+        color: #F44336 !important;
+    }
+
+    /* Mensagens */
+    .message-card {
+        margin: 16px;
+        transition: opacity 0.5s;
+    }
+
+    .message-icon {
+        margin-right: 10px;
+    }
+
+    .success-message .mdl-card__title {
+        color: #4CAF50;
+    }
+
+    .error-message .mdl-card__title {
+        color: #F44336;
+    }
+
+    /* Footer */
+    .mdl-mini-footer {
+        background-color: #7a1507;
+    }
+
+    .back-to-top {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .back-to-top:hover {
+        color: rgba(255, 255, 255, 1);
+    }
+
+    .back-to-top .material-icons {
+        margin-right: 4px;
+    }
+
+    /* Ajustes adicionais */
+    .mdl-button--accent.mdl-button--accent.mdl-button--raised {
+        background-color: #C62828;
+    }
+
+    .mdl-button--accent.mdl-button--accent:not(.mdl-button--raised) {
+        color: #9e1b09;
+    }
+
+    .mdl-layout__drawer > .mdl-layout-title small {
+        font-size: 14px;
+        opacity: 0.8;
+    }
+</style>
+</body>
+</html>

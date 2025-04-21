@@ -1,0 +1,256 @@
+/* Estilos gerais */
+.page-content {
+    padding: 20px;
+}
+
+/* Links de navegação */
+.mdl-navigation__link.is-active {
+    background-color: rgba(255, 255, 255, 0.1);
+    font-weight: 500;
+    position: relative;
+}
+
+.mdl-navigation__link.is-active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: #ff9e80;
+}
+
+/* Cards de mensagens */
+.message-card {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.success-message {
+    border-left: 4px solid #4CAF50;
+}
+
+.error-message {
+    border-left: 4px solid #F44336;
+}
+
+/* Cards de postagens */
+.postagem-card {
+    width: 100%;
+    margin-bottom: 16px;
+    min-height: 320px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.postagem-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 10px rgba(0,0,0,0.2);
+}
+
+.postagem-card__media {
+    background-color: #f5f5f5;
+    height: 200px;
+    background-size: cover;
+    background-position: center;
+}
+
+.postagem-card-wide {
+    width: 100%;
+}
+
+/* Formulários */
+.form-card {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 16px;
+}
+
+.mdl-textfield {
+    width: 100%;
+}
+
+/* Estilizando campos de texto para o tema vermelho */
+.mdl-textfield__label {
+    color: rgba(0,0,0,0.5);
+}
+
+.mdl-textfield--floating-label.is-focused .mdl-textfield__label,
+.mdl-textfield--floating-label.is-dirty .mdl-textfield__label {
+    color: #9e1b09;
+}
+
+.mdl-textfield__label:after {
+    background-color: #9e1b09;
+}
+
+/* Input de arquivo personalizado */
+.mdl-textfield--file {
+    position: relative;
+    width: 100%;
+}
+
+.mdl-textfield--file .mdl-button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+.mdl-textfield--file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* Filtros */
+.filtro-card {
+    width: 100%;
+    margin-bottom: 16px;
+}
+
+/* Dashboard */
+.dashboard-stats {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.stat-card {
+    min-height: 120px;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+}
+
+/* Links pessoais */
+.links-list {
+    list-style: none;
+    padding: 0;
+}
+
+.links-list li {
+    margin-bottom: 8px;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.links-list li:hover {
+    background-color: #f5f5f5;
+}
+
+/* Tema Vermelho - Melhorias adicionais */
+.mdl-card__title.mdl-card--colored {
+    background-color: #9e1b09;
+}
+
+.section-title,
+.page-title {
+    color: #9e1b09;
+}
+
+.section-title:after {
+    background-color: #9e1b09;
+}
+
+.hero-banner {
+    background: linear-gradient(rgba(158, 27, 9, 0.9), rgba(158, 27, 9, 0.7)),
+    url('https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80');
+}
+
+.stat-value {
+    color: #9e1b09;
+}
+
+/* Estilização específica para links */
+a {
+    color: #9e1b09;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+a:hover {
+    color: #c42311;
+}
+
+/* Animações e interações */
+.mdl-button {
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+.mdl-button:active {
+    transform: scale(0.97);
+}
+
+/* Animation para cards */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.mdl-card {
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* Sobreescrever cor padrão de botões e links coloridos */
+.mdl-button--primary.mdl-button--primary {
+    color: #9e1b09;
+}
+
+.mdl-button--raised.mdl-button--colored {
+    background-color: #9e1b09;
+}
+
+.mdl-button--raised.mdl-button--colored:hover {
+    background-color: #c42311;
+}
+
+.mdl-button--fab.mdl-button--colored {
+    background-color: #9e1b09;
+}
+
+.mdl-button--fab.mdl-button--colored:hover {
+    background-color: #c42311;
+}
+
+/* Correção para links e botões nos cards */
+.audience-card .mdl-card__actions .mdl-button--colored {
+    color: #9e1b09;
+}
+
+/* Ajustes para corrigir quaisquer resíduos de azul */
+.mdl-layout__tab-bar-button {
+    background-color: #9e1b09;
+}
+
+.mdl-layout__tab-bar {
+    background-color: #9e1b09;
+}
+
+.mdl-layout.is-upgraded .mdl-layout__tab.is-active::after {
+    background-color: #ff9e80;
+}
+
+.mdl-layout__tab:hover {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.mdl-tabs.is-upgraded .mdl-tabs__tab.is-active {
+    color: #9e1b09;
+}
+
+.mdl-tabs.is-upgraded .mdl-tabs__tab.is-active::after {
+    background-color: #9e1b09;
+}
+
+.mdl-tabs__tab-bar {
+    border-bottom-color: rgba(158, 27, 9, 0.2);
+}

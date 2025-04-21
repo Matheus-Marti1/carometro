@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Gerenciar Ex-Alunos')}">
+    <meta charset="UTF-8">
+    <title>Gerenciar Ex-Alunos - Carômetro</title>
+</head>
+<body>
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <header th:replace="~{fragments/layout :: header}"></header>
+    <div th:replace="~{fragments/admin-layout :: drawer}"></div>
+
+    <!-- Conteúdo principal -->
+    <main class="mdl-layout__content">
+        <div class="page-content">
+            <div th:replace="~{fragments/layout :: messages}"></div>
+
+            <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--12-col">
+                    <h2>Gerenciar Ex-Alunos</h2>
+                </div>
+
+                <!-- Cartões de estatísticas -->
+                <div class="mdl-cell mdl-cell--4-col">
+                    <div class="mdl-card mdl-shadow--2dp status-card">
+                        <div class="mdl-card__title mdl-card--expand">
+                            <h2 class="mdl-card__title-text">Total de Ex-Alunos</h2>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <span class="status-number" th:text="${totalExAlunos}">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mdl-cell mdl-cell--4-col">
+                    <div class="mdl-card mdl-shadow--2dp status-card status-active">
+                        <div class="mdl-card__title mdl-card--expand">
+                            <h2 class="mdl-card__title-text">Ex-Alunos Ativos</h2>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <span class="status-number" th:text="${exAlunosAtivos}">0</span>
+                        </div>
+                        <div class="mdl-card__actions mdl-card--border">
+                            <a th:href="@{/admin/ex-alunos(ativo=true)}" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                                Ver Ativos
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="mdl-cell mdl-cell--4-col">
+                    <div class="mdl-card mdl-shadow--2dp status-card status-pending">
+                        <div class="mdl-card__title mdl-card--expand">
+                            <h2 class="mdl-card__title-text">Ex-Alunos Pendentes</h2>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <span class="status-number" th:text="${exAlunosPendentes}">0</span>
+                        </div>
+                        <div class="mdl-card__actions mdl-card--border">
+                            <a th:href="@{/admin/ex-alunos(ativo=false)}" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                                Ver Pendentes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filtros -->
+                <div class="mdl-cell mdl-cell--12-col">
+                    <div class="filter-tabs">
+                        <a th:href="@{/admin/ex-alunos}"
+                           th:class="${statusAtual == 'TODOS'} ? 'filter-tab active' : 'filter-tab'">
+                            Todos
+                        </a>
+                        <a th:href="@{/admin/ex-alunos(ativo=true)}"
+                           th:class="${statusAtual == 'ATIVO'} ? 'filter-tab active' : 'filter-tab'">
+                            Ativos
+                        </a>
+                        <a th:href="@{/admin/ex-alunos(ativo=false)}"
+                           th:class="${statusAtual == 'PENDENTE'} ? 'filter-tab active' : 'filter-tab'">
+                            Pendentes
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Lista de Ex-Alunos -->
+                <div class="mdl-cell mdl-cell--12-col">
+                    <div class="mdl-card mdl-shadow--2dp" style="width: 100%;">
+                        <div class="mdl-card__title">
+                            <h2 class="mdl-card__title-text" th:text="'Lista de Ex-Alunos ' + ${statusAtual}">Lista de Ex-Alunos</h2>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp" style="width: 100%;">
+                                <thead>
+                                <tr>
+                                    <th class="mdl-data-table__cell--non-numeric">Nome</th>
+                                    <th class="mdl-data-table__cell--non-numeric">Email</th>
+                                    <th class="mdl-data-table__cell--non-numeric">Curso</th>
+                                    <th class="mdl-data-table__cell--non-numeric">Ano de Formatura</th>
+                                    <th class="mdl-data-table__cell--non-numeric">Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="exAluno : ${exAlunos}">
+                                    <td class="mdl-data-table__cell--non-numeric" th:text="${exAluno.nome}">Nome do Ex-Aluno</td>
+                                    <td class="mdl-data-table__cell--non-numeric" th:text="${exAluno.email}">email@example.com</td>
+                                    <td class="mdl-data-table__cell--non-numeric" th:text="${exAluno.curso}">Curso</td>
+                                    <td class="mdl-data-table__cell--non-numeric" th:text="${exAluno.anoFormatura}">2020</td>
+                                    <td class="mdl-data-table__cell--non-numeric">
+                                        <span th:if="${exAluno.ativo}" class="status-badge status-aprovada">Ativo</span>
+                                        <span th:unless="${exAluno.ativo}" class="status-badge status-pendente">Pendente</span>
+                                    </td>
+                                    <td>
+                                        <a th:href="@{/admin/ex-alunos/{id}(id=${exAluno.id})}"
+                                           class="mdl-button mdl-js-button mdl-button--icon"
+                                           title="Ver detalhes">
+                                            <i class="material-icons">visibility</i>
+                                        </a>
+                                        <!-- Botão para ativar (visível apenas para ex-alunos pendentes) -->
+                                        <button th:if="${!exAluno.ativo}"
+                                                th:onclick="'document.getElementById(\'form-ativar-' + ${exAluno.id} + '\').submit();'"
+                                                class="mdl-button mdl-js-button mdl-button--icon"
+                                                title="Ativar Ex-Aluno">
+                                            <i class="material-icons">check_circle</i>
+                                        </button>
+                                        <!-- Botão para desativar (visível apenas para ex-alunos ativos e apenas para ADMIN) -->
+                                        <button th:if="${exAluno.ativo}"
+                                                sec:authorize="hasRole('ADMIN')"
+                                                th:onclick="'document.getElementById(\'form-desativar-' + ${exAluno.id} + '\').submit();'"
+                                                class="mdl-button mdl-js-button mdl-button--icon"
+                                                title="Desativar Ex-Aluno">
+                                            <i class="material-icons">block</i>
+                                        </button>
+                                        <!-- Formulários ocultos para enviar as ações -->
+                                        <form th:if="${!exAluno.ativo}"
+                                              th:id="'form-ativar-' + ${exAluno.id}"
+                                              th:action="@{/admin/ex-alunos/{id}/ativar(id=${exAluno.id})}"
+                                              method="post" style="display: none;"></form>
+                                        <form th:if="${exAluno.ativo}"
+                                              th:id="'form-desativar-' + ${exAluno.id}"
+                                              th:action="@{/admin/ex-alunos/{id}/desativar(id=${exAluno.id})}"
+                                              method="post" style="display: none;"></form>
+                                    </td>
+                                </tr>
+                                <!-- Mensagem quando não há ex-alunos -->
+                                <tr th:if="${#lists.isEmpty(exAlunos)}">
+                                    <td colspan="6" class="mdl-data-table__cell--non-numeric">
+                                        Nenhum ex-aluno encontrado
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                            <!-- Paginação -->
+                            <div th:if="${page.totalPages > 1}" class="pagination-container">
+                                <div class="pagination">
+                                    <a th:if="${!page.first}"
+                                       th:with="prevPage=${page.number - 1}"
+                                       th:href="@{/admin/ex-alunos(ativo=${param.ativo},page=${prevPage},size=${page.size})}"
+                                       class="mdl-button mdl-js-button mdl-button--icon">
+                                        <i class="material-icons">chevron_left</i>
+                                    </a>
+                                    <span th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}">
+            <a th:if="${i == page.number}"
+               class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+                [[${i + 1}]]
+            </a>
+            <a th:unless="${i == page.number}"
+               th:href="@{/admin/ex-alunos(ativo=${param.ativo},page=${i},size=${page.size})}"
+               class="mdl-button mdl-js-button">
+                [[${i + 1}]]
+            </a>
+        </span>
+                                    <a th:if="${!page.last}"
+                                       th:with="nextPage=${page.number + 1}"
+                                       th:href="@{/admin/ex-alunos(ativo=${param.ativo},page=${nextPage},size=${page.size})}"
+                                       class="mdl-button mdl-js-button mdl-button--icon">
+                                        <i class="material-icons">chevron_right</i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+    </main>
+</div>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+<style>
+    .status-card {
+        min-height: 150px;
+    }
+    .status-active {
+        border-left: 5px solid #66BB6A;
+    }
+    .status-pending {
+        border-left: 5px solid #FFA726;
+    }
+    .status-number {
+        font-size: 48px;
+        font-weight: 500;
+    }
+    .status-badge {
+        padding: 3px 8px;
+        border-radius: 4px;
+        color: white;
+        font-size: 12px;
+    }
+    .status-aprovada {
+        background-color: #66BB6A;
+    }
+    .status-pendente {
+        background-color: #FFA726;
+    }
+    .filter-tabs {
+        display: flex;
+        margin-bottom: 20px;
+    }
+    .filter-tab {
+        padding: 12px 24px;
+        color: rgba(0,0,0,.54);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border-bottom: 2px solid transparent;
+    }
+    .filter-tab.active {
+        color: rgba(0,0,0,.87);
+        border-bottom: 2px solid #3f51b5;
+    }
+    .filter-tab:hover {
+        background-color: rgba(0,0,0,.04);
+    }
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    .pagination {
+        display: flex;
+        align-items: center;
+    }
+</style>
+</body>
+</html>
